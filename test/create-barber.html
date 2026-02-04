@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Barber - Boss Lupit Gupit</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --brown-dark: #593A21;
+            --brown-mid: #8C6A4D;
+            --brown-light: #A67C52;
+            --cream-bg: #F1E4D1;
+        }
+
+        body {
+            margin: 0; padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--cream-bg);
+            min-height: 100vh;
+            display: flex; flex-direction: column; align-items: center;
+            justify-content: center;
+            position: relative; overflow: hidden;
+        }
+
+        .blob { position: absolute; border-radius: 50%; z-index: 0; }
+        .blob-1 { width: 500px; height: 500px; background: var(--brown-light); bottom: -200px; right: -100px; }
+        .blob-2 { width: 350px; height: 350px; background: var(--brown-dark); bottom: -100px; left: -150px; }
+        .blob-3 { width: 250px; height: 250px; background: var(--brown-mid); bottom: -100px; right: -100px; }
+        .blob-4 { width: 300px; height: 300px; background: var(--brown-mid); bottom: -150px; left: -250px; }
+
+        .card {
+            background: rgba(255,255,255,0.85);
+            border-radius: 20px;
+            padding: 40px;
+            width: 100%; max-width: 420px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.1);
+            z-index: 10; position: relative;
+        }
+
+        .card h1 {
+            color: var(--brown-dark);
+            font-size: 1.8rem;
+            margin: 0 0 5px;
+            text-align: center;
+        }
+
+        .card .subtitle {
+            color: var(--brown-mid);
+            text-align: center;
+            margin: 0 0 25px;
+            font-size: 0.9rem;
+        }
+
+        .input-group { margin-bottom: 14px; }
+
+        .input-group label {
+            display: block;
+            color: var(--brown-dark);
+            font-size: 0.82rem;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .input-group input, .input-group textarea {
+            width: 100%; box-sizing: border-box;
+            padding: 10px 14px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            background: #fff;
+            transition: border 0.2s;
+        }
+
+        .input-group input:focus, .input-group textarea:focus {
+            outline: none;
+            border-color: var(--brown-light);
+        }
+
+        .input-group textarea { resize: vertical; min-height: 70px; }
+
+        .btn {
+            width: 100%;
+            padding: 12px;
+            background: var(--brown-dark);
+            color: white;
+            border: none;
+            border-radius: 30px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: 0.3s;
+        }
+
+        .btn:hover { background: var(--brown-mid); }
+        .btn:disabled { background: var(--brown-mid); opacity: 0.6; cursor: not-allowed; }
+
+        .btn-back {
+            width: 100%;
+            padding: 10px;
+            background: transparent;
+            color: var(--brown-dark);
+            border: 2px solid var(--brown-dark);
+            border-radius: 30px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 8px;
+            transition: 0.3s;
+        }
+
+        .btn-back:hover { background: var(--brown-dark); color: white; }
+
+        #status {
+            text-align: center;
+            margin-top: 16px;
+            font-size: 0.9rem;
+            min-height: 1.2em;
+            color: var(--brown-dark);
+        }
+
+        #status.error { color: #c0392b; }
+        #status.success { color: #27ae60; }
+    </style>
+</head>
+<body>
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+    <div class="blob blob-3"></div>
+    <div class="blob blob-4"></div>
+
+    <div class="card">
+        <h1><i class="fas fa-user-plus"></i> Create Barber</h1>
+        <p class="subtitle">Admin — add a new barber to the system</p>
+
+        <div class="input-group">
+            <label>First Name</label>
+            <input type="text" id="firstName" placeholder="e.g. John" required>
+        </div>
+        <div class="input-group">
+            <label>Last Name</label>
+            <input type="text" id="lastName" placeholder="e.g. Doe" required>
+        </div>
+        <div class="input-group">
+            <label>Email</label>
+            <input type="email" id="email" placeholder="e.g. john@blg.test" required>
+        </div>
+        <div class="input-group">
+            <label>Contact Number</label>
+            <input type="tel" id="contactNumber" placeholder="e.g. 09001234567" required>
+        </div>
+        <div class="input-group">
+            <label>Birth Date</label>
+            <input type="date" id="birthDate" required>
+        </div>
+        <div class="input-group">
+            <label>Years of Experience</label>
+            <input type="number" id="yearsExp" placeholder="e.g. 5" min="0" required>
+        </div>
+        <div class="input-group">
+            <label>Bio (shown on About page)</label>
+            <textarea id="bio" placeholder="Short introduction for the barber..."></textarea>
+        </div>
+        <div class="input-group">
+            <label>Temporary Password</label>
+            <input type="password" id="password" placeholder="Barber changes this later" required>
+        </div>
+
+        <button class="btn" id="createBtn">Create Barber Account</button>
+        <button class="btn-back" onclick="window.location.href='dashboard.html'">Back to Dashboard</button>
+        <div id="status"></div>
+    </div>
+
+    <script type="module">
+        import { supabase } from './supabaseclient.js';
+        import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+
+        const btn = document.getElementById('createBtn');
+        const status = document.getElementById('status');
+
+        // Get Supabase URL and anon key from the existing client
+        const SUPABASE_URL = supabase.supabaseUrl;
+        const SUPABASE_ANON_KEY = supabase.supabaseKey;
+
+        // Check if admin is logged in
+        (async () => {
+            const { data: { session } } = await supabase.auth.getSession();
+            if (!session) {
+                status.className = 'error';
+                status.textContent = 'You must be logged in as admin to use this page.';
+                btn.disabled = true;
+                return;
+            }
+
+            const { data: profile } = await supabase
+                .from('tbl_users')
+                .select('role')
+                .eq('id', session.user.id)
+                .single();
+
+            if (profile?.role !== 'admin') {
+                status.className = 'error';
+                status.textContent = 'Only admins can create barber accounts.';
+                btn.disabled = true;
+            }
+        })();
+
+        btn.addEventListener('click', async () => {
+            status.className = '';
+            status.textContent = '';
+
+            const firstName = document.getElementById('firstName').value.trim();
+            const lastName = document.getElementById('lastName').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const contactNumber = document.getElementById('contactNumber').value.trim();
+            const birthDate = document.getElementById('birthDate').value;
+            const yearsExp = parseInt(document.getElementById('yearsExp').value) || 0;
+            const bio = document.getElementById('bio').value.trim();
+            const password = document.getElementById('password').value;
+
+            if (!firstName || !lastName || !email || !contactNumber || !birthDate || !password) {
+                status.className = 'error';
+                status.textContent = 'Please fill in all required fields.';
+                return;
+            }
+
+            btn.disabled = true;
+            btn.textContent = 'Creating...';
+
+            try {
+                status.textContent = 'Creating auth account...';
+
+                // Create a SEPARATE Supabase client just for the barber signup
+                const tempClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+                    auth: {
+                        persistSession: false,  // Don't persist this session
+                        autoRefreshToken: false,
+                        detectSessionInUrl: false
+                    }
+                });
+
+                // Sign up the barber using the temp client
+                const { data: authData, error: authError } = await tempClient.auth.signUp({
+                    email: email,
+                    password: password
+                });
+
+                if (authError) throw authError;
+
+                status.textContent = 'Creating barber profile...';
+
+                // Call the admin function using the MAIN client (still logged in as admin)
+                const { data: result, error: funcError } = await supabase.rpc('admin_create_barber', {
+                    p_auth_user_id: authData.user.id,
+                    p_first_name: firstName,
+                    p_last_name: lastName,
+                    p_email: email,
+                    p_contact_number: contactNumber,
+                    p_birth_date: birthDate,
+                    p_years_of_experience: yearsExp,
+                    p_bio: bio || `${firstName} ${lastName} - Barber at Boss Lupit Gupit`
+                });
+
+                if (funcError) throw funcError;
+                if (!result.success) throw new Error(result.error);
+
+                status.className = 'success';
+                status.textContent = `Barber "${firstName} ${lastName}" created successfully!`;
+
+                // Reset form
+                document.querySelectorAll('input, textarea').forEach(el => el.value = '');
+                btn.textContent = 'Create Barber Account';
+                btn.disabled = false;
+
+            } catch (error) {
+                status.className = 'error';
+                status.textContent = '' + error.message;
+                btn.textContent = 'Create Barber Account';
+                btn.disabled = false;
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,275 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', 'Segoe UI', sans-serif;
+}
+
+:root {
+    --primary-brown: #4a2c0a; 
+    --active-nav: #8b5a2b;
+    --seat-green: #68b948;
+    --seat-blue: #2182ca;
+    --seat-red: #da3333;
+    --seat-brown: #92400e;
+    --seat-gray: #6b7280;
+    --bg-light: #f9f9f9;
+}
+
+body {
+    background-color: #ffffff;
+    color: #333;
+    overflow-x: hidden;
+}
+
+.navbar {
+    background-color: var(--primary-brown);
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 40px;
+    height: 90px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    position: relative; 
+    top: 0;
+    z-index: 100;
+}
+
+.logo {
+    font-weight: 800;
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: white;
+    text-decoration: none;
+    letter-spacing: 1px;
+    z-index: 2;
+}
+
+.logo img {
+    height: 55px;
+    width: auto;
+}
+
+.navbar nav {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1;
+}
+
+.navbar nav ul {
+    list-style: none;
+    display: flex;
+    gap: 60px; 
+}
+
+.navbar nav ul li a {
+    color: white;
+    text-decoration: none;
+    font-weight: 800; 
+    font-size: 1.3rem; 
+    text-transform: uppercase;
+    padding-bottom: 5px;
+    transition: opacity 0.3s;
+    letter-spacing: 0.5px;
+}
+
+.navbar nav ul li a:hover { opacity: 0.8; }
+.navbar nav ul li a.active { border-bottom: 4px solid #f5ead6; }
+
+.user-profile {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    font-size: 1rem;
+    font-weight: 600;
+    position: relative;
+    cursor: pointer;
+    z-index: 2;
+}
+
+.user-profile i { color: white; transition: transform 0.2s; }
+.user-profile:hover i { transform: scale(1.1); }
+
+.dropdown-menu {
+    display: none;
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background-color: white;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    border-radius: 8px;
+    padding: 10px 0;
+    min-width: 150px;
+    z-index: 1000;
+    margin-top: 10px;
+    border: 1px solid #eee;
+}
+.dropdown-menu.show { display: block; }
+.dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 20px;
+    color: #4a2c0a;
+    text-decoration: none;
+    font-weight: 600;
+}
+.dropdown-item:hover { background-color: #f5ead6; }
+
+.container {
+    max-width: 1200px;
+    margin: 40px auto;
+    padding: 0 20px;
+    text-align: center;
+}
+
+h1 {
+    font-size: 2.5rem;
+    margin-bottom: 10px;
+    color: var(--primary-brown);
+}
+
+.subtitle {
+    color: #666;
+    margin-bottom: 50px;
+    font-size: 1.1rem;
+}
+
+.seats-container {
+    display: flex;
+    justify-content: center;
+    gap: 50px;
+    flex-wrap: wrap;
+    margin-bottom: 60px;
+}
+
+.seat-card {
+    background: white;
+    width: 280px;
+    border-radius: 15px;
+    padding: 20px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+    border: 1px solid #eee;
+    transition: transform 0.3s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.seat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+}
+
+.seat-box {
+    width: 140px;
+    height: 140px;
+    border: 3px solid #ddd;
+    border-radius: 12px;
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    background-color: #fcfcfc;
+    cursor: pointer;
+    transition: border-color 0.3s;
+}
+
+.seat-color {
+    width: 100px;
+    height: 100px;
+    border-radius: 8px;
+    transition: background-color 0.3s;
+}
+
+.seat-status-icon {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 1.5rem;
+    color: white;
+}
+
+/* Seat color states */
+.available { border-color: var(--seat-green); }
+.available .seat-color { background-color: var(--seat-green); }
+
+.reserved-user { border-color: var(--seat-blue); }
+.reserved-user .seat-color { background-color: var(--seat-blue); }
+
+.upcoming { border-color: var(--seat-brown); }
+.upcoming .seat-color { background-color: var(--seat-brown); }
+
+.occupied { border-color: var(--seat-red); cursor: not-allowed; }
+.occupied .seat-color { background-color: var(--seat-red); }
+
+.closed { border-color: var(--seat-gray); cursor: not-allowed; }
+.closed .seat-color { background-color: var(--seat-gray); }
+
+h3 { margin: 10px 0 5px; font-size: 1.4rem; color: #333; }
+.status-text { font-weight: 700; text-transform: uppercase; font-size: 0.9rem; margin-bottom: 10px; }
+.text-green { color: var(--seat-green); }
+.text-blue { color: var(--seat-blue); }
+.text-red { color: var(--seat-red); }
+.text-brown { color: var(--seat-brown); }
+.text-gray { color: var(--seat-gray); }
+
+.desc {
+    font-size: 0.9rem;
+    color: #666;
+    margin-bottom: 20px;
+    min-height: 40px; 
+}
+
+.desc.warning { color: #e67e22; font-size: 0.8rem; line-height: 1.4; }
+
+.barber-name {
+    font-size: 0.85rem;
+    color: #888;
+    margin-bottom: 10px;
+}
+
+.btn-action {
+    background-color: var(--primary-brown);
+    color: white;
+    border: none;
+    padding: 10px 30px;
+    border-radius: 20px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+    width: 100%;
+}
+.btn-action:hover { background-color: #5d3a00; }
+.btn-action:disabled { opacity: 0.5; cursor: not-allowed; background-color: #999; }
+
+.btn-secondary { background-color: #7f8c8d; }
+.btn-secondary:hover { background-color: #555; }
+
+.legend {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    margin-top: 40px;
+    padding-top: 20px;
+    border-top: 1px solid #eee;
+    flex-wrap: wrap;
+}
+.legend-item { display: flex; align-items: center; gap: 10px; font-weight: 600; font-size: 0.9rem; }
+.dot { width: 15px; height: 15px; border-radius: 50%; }
+.dot.green { background-color: var(--seat-green); }
+.dot.blue { background-color: var(--seat-blue); }
+.dot.red { background-color: var(--seat-red); }
+.dot.brown { background-color: var(--seat-brown); }
+.dot.gray { background-color: var(--seat-gray); }
+
+@media (max-width: 900px) {
+    .seats-container { flex-direction: column; align-items: center; }
+    .navbar { padding: 0 20px; }
+    .navbar nav ul { display: none; }
+}

@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Announcement - Boss Lupit Gupit</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="admin-announcements.css">
+    <link rel="icon" type="image/png" href="blgcircle.png">
+</head>
+<body>
+
+    <header class="navbar">
+        <a href="dashboard.html" class="logo">
+            <img src="blgcircle.png" alt="BLG" class="logo-img"> BOSS LUPIT GUPIT
+        </a>
+        <nav>
+            <ul>
+                <li><a href="dashboard.html">Home</a></li>
+                <li><a href="barbers-service-history.html">Barbers Service History</a></li>
+                <li><a href="admin-logs.html">Logs</a></li>
+            </ul>
+        </nav>
+        
+        <div class="user-profile" id="userProfileContainer">
+            <span id="userName">Hi, user123</span>
+            <i class="fa-solid fa-circle-user fa-2xl" id="userIcon"></i>
+            
+            <div class="dropdown-menu" id="userDropdown">
+                <a href="#" class="dropdown-item" id="signOutLink">
+                    <i class="fa-solid fa-right-from-bracket"></i> Sign Out
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+        <div class="page-header">
+            <button class="back-btn" onclick="window.location.href='dashboard.html'">
+                <i class="fa-solid fa-arrow-left"></i>
+            </button>
+            <h1>Create Announcement</h1>
+        </div>
+
+        <div class="announcement-section">
+            <h2>General</h2>
+            <p class="section-desc">Make announcements for both clients and barbers</p>
+            <textarea id="generalMsg" placeholder="Enter announcement message..." rows="3"></textarea>
+            <button class="btn-announce" onclick="createAnnouncement('general')">Announce</button>
+        </div>
+
+        <div class="announcement-section">
+            <h2>For Clients</h2>
+            <p class="section-desc">Make specific announcements for clients</p>
+            <textarea id="clientMsg" placeholder="Enter client-specific announcement..." rows="3"></textarea>
+            <button class="btn-announce" onclick="createAnnouncement('client')">Announce</button>
+        </div>
+
+        <div class="announcement-section">
+            <h2>For Admin</h2>
+            <p class="section-desc">Make specific announcements for barbers</p>
+            <textarea id="barberMsg" placeholder="Enter barber-specific announcement..." rows="3"></textarea>
+            <button class="btn-announce" onclick="createAnnouncement('barber')">Announce</button>
+        </div>
+    </main>
+
+    <script type="module" src="admin-announcements.js"></script>
+</body>
+</html>

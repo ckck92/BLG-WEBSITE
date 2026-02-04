@@ -1,0 +1,301 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    background-color: #ffffff;
+    color: #333;
+    overflow-x: hidden;
+}
+
+.navbar {
+    background-color: #4a2c0a;
+    color: white;
+    display: flex;
+    justify-content: space-between; 
+    align-items: center;
+    padding: 0 40px;
+    height: 90px; 
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    position: relative; 
+    z-index: 100;
+}
+
+.logo {
+    font-weight: 800;
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: white;
+    text-decoration: none;
+    letter-spacing: 1px;
+}
+
+.logo img {
+    height: 55px; 
+}
+
+.navbar nav {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1;
+}
+
+.navbar nav ul {
+    list-style: none;
+    display: flex;
+    gap: 60px; 
+}
+
+.navbar nav ul li a {
+    color: white;
+    text-decoration: none;
+    font-weight: 800; 
+    font-size: 1.3rem; 
+    text-transform: uppercase;
+    padding-bottom: 5px;
+    transition: opacity 0.3s;
+    letter-spacing: 0.5px;
+}
+
+.navbar nav ul li a:hover { opacity: 0.8; }
+.navbar nav ul li a.active { border-bottom: 4px solid #f5ead6; }
+
+.user-profile {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    font-size: 1rem;
+    font-weight: 600;
+    position: relative;
+    cursor: pointer;
+    z-index: 2;
+}
+
+.user-profile i { color: white; transition: transform 0.2s; }
+.user-profile:hover i { transform: scale(1.1); }
+
+.dropdown-menu {
+    display: none;
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background-color: white;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    border-radius: 8px;
+    padding: 10px 0;
+    min-width: 150px;
+    z-index: 1000;
+    margin-top: 10px;
+    border: 1px solid #eee;
+}
+.dropdown-menu.show { display: block; }
+.dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 20px;
+    color: #4a2c0a;
+    text-decoration: none;
+    font-weight: 600;
+}
+.dropdown-item:hover { background-color: #f5ead6; }
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-5px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.hero {
+    height: 350px;
+    background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), 
+                url('https://images.unsplash.com/photo-1503951914875-befbb6470523?q=80&w=2068&auto=format&fit=crop');
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    text-align: center;
+    position: relative;
+}
+
+.hero h1 {
+    font-size: 3rem;
+    letter-spacing: 2px;
+    margin-bottom: 25px;
+    font-weight: 800;
+    text-transform: uppercase;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+}
+
+.btn-reserve {
+    background-color: #8b5a2b;
+    color: white;
+    border: none;
+    padding: 15px 50px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.3s, transform 0.2s;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+}
+
+.btn-reserve:hover {
+    background-color: #a06b35;
+    transform: translateY(-2px);
+}
+
+.container {
+    max-width: 1200px;
+    margin: 40px auto;
+    padding: 0 20px;
+}
+
+.dashboard-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 40px;
+    margin-bottom: 60px;
+}
+
+.col-left, .col-right {
+    flex: 1;
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 15px;
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: #4a2c0a;
+    border-bottom: 2px solid #eee;
+    padding-bottom: 10px;
+}
+
+.align-right {
+    justify-content: flex-end;
+}
+
+.card {
+    border: 1px solid #e0e0e0;
+    border-radius: 10px;
+    padding: 25px;
+    min-height: 120px;
+    background-color: white;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    transition: box-shadow 0.3s;
+}
+
+.card:hover {
+    box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+}
+
+.reservation-card .card-top {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+.title-text {
+    color: #8b5a2b;
+    font-weight: 800;
+    font-size: 1.2rem;
+}
+
+.time-left {
+    font-size: 0.9rem;
+    color: #e74c3c; 
+    font-weight: 600;
+    background: #ffecec;
+    padding: 2px 8px;
+    border-radius: 4px;
+}
+
+.description-text {
+    color: #555;
+    font-size: 1rem;
+}
+
+.announcement-card {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    font-weight: 600;
+    color: #444;
+    background-color: #fff9f0;
+    border-color: #f0e0d0;
+}
+
+.icon-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 30px;
+    margin-top: 20px;
+    padding-bottom: 40px;
+}
+
+.icon-card {
+    text-align: center;
+}
+
+.icon-box {
+    border: 1px solid #ddd;
+    border-radius: 15px;
+    height: 160px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 15px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    background: white;
+}
+
+.icon-box img {
+    width: 70px;
+    height: auto;
+    opacity: 0.9;
+    transition: transform 0.3s;
+}
+
+.icon-box:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    border-color: #8b5a2b;
+}
+
+.icon-box:hover img {
+    transform: scale(1.1);
+}
+
+.icon-label {
+    font-weight: 700;
+    font-size: 1rem;
+    color: #4a2c0a;
+}
+
+@media (max-width: 900px) {
+    .navbar { padding: 0 20px; }
+    .hero h1 { font-size: 2rem; }
+    .dashboard-row { flex-direction: column; gap: 30px; }
+    .icon-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 600px) {
+    .navbar nav ul { display: none; }
+    .icon-grid { grid-template-columns: 1fr; }
+    .col-right .section-header { justify-content: flex-start; }
+}
+.announcement-icon {
+    margin-right: 10px;
+    color: #8b5a2b;
+}

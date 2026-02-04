@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Boss Lupit Gupit - Live Seats</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="seats.css">
+    <link rel="icon" type="image/png" href="blgcircle.png">
+</head>
+<body>
+
+    <header class="navbar">
+        <a href="dashboard.html" class="logo">
+            <img src="blgletterwhite.png" alt="logo"> BOSS LUPIT GUPIT
+        </a>
+        <nav id="mainNav">
+            <!-- Populated by JS based on role -->
+        </nav>
+        
+        <div class="user-profile" id="userProfileContainer">
+            <span id="userName">Hi, user</span>
+            <i class="fa-solid fa-circle-user fa-2xl" id="userIcon"></i>
+            
+            <div class="dropdown-menu" id="userDropdown">
+                <a href="#" class="dropdown-item" id="signOutLink">
+                    <i class="fa-solid fa-right-from-bracket"></i> Sign Out
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+        <h1>View Live Seats</h1>
+        <p class="subtitle">Check real-time availability and status of our barber chairs.</p>
+
+        <div class="seats-container" id="seatsContainer">
+            <!-- Seats will be dynamically populated by JS -->
+            <p style="color: #666;">Loading seats...</p>
+        </div>
+        
+        <div class="legend" id="legendContainer">
+            <!-- Legend populated by JS based on role -->
+        </div>
+    </main>
+
+    <script type="module" src="seats.js"></script>
+</body>
+</html>

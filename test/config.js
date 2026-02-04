@@ -1,0 +1,4 @@
+const SUPABASE_URL = 'https://ztvkvxclecforhwgpejc.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp0dmt2eGNsZWNmb3Jod2dwZWpjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg5MjI4NjUsImV4cCI6MjA4NDQ5ODg2NX0.Svk4xa7pw4Z6MLdGrmzF_zxav7SZxU_nddM3ekVaoCk';
+
+export { SUPABASE_URL, SUPABASE_ANON_KEY };
