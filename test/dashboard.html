@@ -20,15 +20,20 @@
         <div class="user-profile" id="userProfileContainer">
             <span id="userName">Hi, user123</span>
             <i class="fa-solid fa-circle-user fa-2xl" id="userIcon"></i>
+            
             <div class="dropdown-menu" id="userDropdown">
+                <a href="profile.html" class="dropdown-item">
+                    <i class="fa-solid fa-id-card"></i>
+                    View Profile
+                </a>
                 <a href="#" class="dropdown-item" id="signOutLink">
-                    <i class="fa-solid fa-right-from-bracket"></i> Sign Out
+                    <i class="fa-solid fa-right-from-bracket"></i>
+                    Sign Out
                 </a>
             </div>
         </div>
     </header>
 
-    <!-- CLIENT VIEW -->
     <div id="clientDashboard" style="display:none;">
         <section class="hero">
             <div class="hero-overlay">
@@ -40,7 +45,7 @@
         <main class="container">
             <div class="dashboard-row">
                 <div class="col-left">
-                    <div class="section-header">Your Upcoming Reservations</div>
+                    <div class="section-header">Your Upcoming Reservation</div>
                     <div class="card reservation-card">
                         <div class="card-top">
                             <span class="title-text">Loading...</span>
@@ -49,7 +54,7 @@
                 </div>
 
                 <div class="col-right">
-                    <div class="section-header align-right">Announcements</div>
+                    <div class="section-header align-right">Announcement</div>
                     <div class="card announcement-card">
                         <i class="fa-solid fa-bullhorn" style="margin-right: 10px; color: #8b5a2b;"></i>
                         Loading...
@@ -58,82 +63,26 @@
             </div>
 
             <div class="icon-grid">
-                <div class="icon-card">
+                <div class="info-card" id="scheduleCard">
                     <div class="icon-box"><img src="light.png" alt="Shop"></div>
-                    <div class="icon-label">The Shop</div>
+                    <div class="icon-label">Shop Schedule</div>
                 </div>
-                <div class="icon-card">
+                <div class="info-card" id="crewCard">
                     <div class="icon-box"><img src="barber.png" alt="Crew"></div>
-                    <div class="icon-label">The Crew</div>
+                    <div class="icon-label">Meet The Crew</div>
+                    
                 </div>
-                <div class="icon-card">
+                <div class="info-card" id="servicesCard">
                     <div class="icon-box"><img src="scissorcomb.png" alt="Services"></div>
                     <div class="icon-label">Our Services</div>
                 </div>
-                <div class="icon-card">
+                <div class="info-card" id="haircutsCard">
                     <div class="icon-box"><img src="hair.png" alt="Haircuts"></div>
                     <div class="icon-label">Recommended Haircuts</div>
                 </div>
             </div>
         </main>
     </div>
-
-    <!-- ADMIN VIEW -->
-    <div id="adminDashboard" style="display:none;">
-        <main class="container" style="padding-top: 30px;">
-            <div class="section-header">Admin Panel</div>
-
-            <div class="icon-grid" style="margin-top: 20px;">
-                <a href="create-barber.html" class="icon-card" style="text-decoration:none; color:inherit;">
-                    <div class="icon-box" style="background:#593A21;">
-                        <i class="fa-solid fa-user-plus" style="color:#fff; font-size:2rem;"></i>
-                    </div>
-                    <div class="icon-label">Create Barber</div>
-                </a>
-
-                <a href="admin-manage-reservations.html" class="icon-card" style="text-decoration:none; color:inherit;">
-                    <div class="icon-box" style="background:#8C6A4D;">
-                        <i class="fa-solid fa-calendar-check" style="color:#fff; font-size:2rem;"></i>
-                    </div>
-                    <div class="icon-label">Manage Reservations</div>
-                </a>
-
-                <a href="admin-seats.html" class="icon-card" style="text-decoration:none; color:inherit;">
-                    <div class="icon-box" style="background:#A67C52;">
-                        <i class="fa-solid fa-chair" style="color:#fff; font-size:2rem;"></i>
-                    </div>
-                    <div class="icon-label">Live Seats</div>
-                </a>
-
-                <a href="admin-announcements.html" class="icon-card" style="text-decoration:none; color:inherit;" id="announcementCard">
-                    <div class="icon-box" style="background:#593A21;">
-                        <i class="fa-solid fa-bullhorn" style="color:#fff; font-size:2rem;"></i>
-                    </div>
-                    <div class="icon-label">Announcements</div>
-                </a>
-            </div>
-
-            <div class="dashboard-row" style="margin-top: 30px;">
-                <div class="col-left">
-                    <div class="section-header">Recent Reservations</div>
-                    <div class="card reservation-card" id="adminReservationsCard">
-                        <div class="card-top">
-                            <span class="title-text">Loading...</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-right">
-                    <div class="section-header align-right">Announcements</div>
-                    <div class="card announcement-card" id="adminAnnouncementCard">
-                        <i class="fa-solid fa-bullhorn" style="margin-right: 10px; color: #8b5a2b;"></i>
-                        Loading...
-                    </div>
-                </div>
-            </div>
-        </main>
-    </div>
-
     <script type="module" src="dashboard.js"></script>
 </body>
 </html>

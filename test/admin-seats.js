@@ -118,7 +118,7 @@ function renderSeatCard(seat, ongoingReservations, isShopOpen) {
         statusColor = 'text-green';
         description = 'Ready for Walk-ins or Reservations';
         icon = '<i class="fa-regular fa-circle-check"></i>';
-        buttonHtml = '<button class="btn-action" onclick="window.location.href=\'admin-manage-reservations.html\'">Manage</button>';
+        buttonHtml = '';
     }
 
     return `

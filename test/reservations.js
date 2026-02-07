@@ -1,66 +1,110 @@
 import { supabase } from './supabaseclient.js';
 
 let currentUser = null;
-let selectedServices = [];
-let allServices = {};
+let selectedBaseService = null;
+let selectedModernCutType = null;
+let selectedAddons = [];
+let allServices = [];
+let allBarbers = [];
 
 document.addEventListener('DOMContentLoaded', async () => {
     await checkAuth();
     await loadServices();
-    await loadAvailableSeats();
-    await loadUserReservations();
+    await loadBarbers();
     setupEventListeners();
 });
 
 async function checkAuth() {
-    const { data: { session } } = await supabase.auth.getSession();
-    if (!session) {
+    const { data: { user } } = await supabase.auth.getUser();
+    
+    if (!user) {
         window.location.href = 'login.html';
         return;
     }
-    
+
     const { data: profile } = await supabase
         .from('tbl_users')
         .select('*')
-        .eq('id', session.user.id)
+        .eq('id', user.id)
         .single();
-    
+
+    if (profile?.role === 'admin') {
+        window.location.href = 'admin-dashboard.html';
+        return;
+    }
+
     currentUser = profile;
     
-    // Update username in header
-    const userSpan = document.querySelector('#userProfileContainer span');
-    if (userSpan) userSpan.textContent = `Hi, ${currentUser.first_name}`;
-    
-    // Pre-fill recipient name with current user's name
     const recipientInput = document.getElementById('recipientName');
-    if (recipientInput && !recipientInput.value) {
+    if (recipientInput && currentUser) {
         recipientInput.value = `${currentUser.first_name} ${currentUser.last_name}`;
     }
 }
 
 async function loadServices() {
-    const { data: services } = await supabase
+    const { data, error } = await supabase
         .from('tbl_services')
         .select('*')
-        .eq('is_active', true)
-        .order('price');
-    
-    allServices = {
-        general: services.filter(s => s.service_type === 'general'),
-        modern_cut: services.filter(s => s.service_type === 'modern_cut'),
-        bossing: services.filter(s => s.service_type === 'bossing'),
-        addons: services.filter(s => s.service_type === 'addon')
-    };
-    
-    renderServiceMenu();
+        .order('service_type');
+
+    if (error) {
+        console.error('Error loading services:', error);
+        return;
+    }
+
+    allServices = data;
+    populateServiceDropdown();
 }
 
-async function loadAvailableSeats() {
-    const { data: seats, error } = await supabase
+function populateServiceDropdown() {
+    const serviceSelect = document.getElementById('serviceSelect');
+    if (!serviceSelect) return;
+
+    const generalServices = allServices.filter(s => s.service_type === 'general' && s.can_be_base);
+    const modernCutServices = allServices.filter(s => s.service_type === 'modern_cut' && s.can_be_base);
+    const bossingServices = allServices.filter(s => s.service_type === 'bossing' && s.can_be_base);
+
+    let options = '<option value="">Select a service</option>';
+    
+    if (generalServices.length > 0) {
+        options += '<optgroup label="General Services">';
+        generalServices.forEach(service => {
+            options += `<option value="${service.id}" data-type="general" data-price="${service.price}">
+                ${service.name} - ₱${service.price}
+            </option>`;
+        });
+        options += '</optgroup>';
+    }
+
+    if (modernCutServices.length > 0) {
+        const modernCutPrice = modernCutServices[0].price;
+        options += '<optgroup label="Modern Cut">';
+        options += `<option value="modern_cut" data-type="modern_cut" data-price="${modernCutPrice}">
+            Modern Cut - ₱${modernCutPrice}
+        </option>`;
+        options += '</optgroup>';
+    }
+
+    if (bossingServices.length > 0) {
+        options += '<optgroup label="Bossing Packages">';
+        bossingServices.forEach(service => {
+            options += `<option value="${service.id}" data-type="bossing" data-price="${service.price}">
+                ${service.name} - ₱${service.price}
+            </option>`;
+        });
+        options += '</optgroup>';
+    }
+
+    serviceSelect.innerHTML = options;
+}
+
+async function loadBarbers() {
+    const { data, error } = await supabase
         .from('tbl_seats')
         .select(`
             *,
             tbl_barbers (
+                id,
                 user_id,
                 tbl_users (first_name, last_name)
             )
@@ -69,306 +113,335 @@ async function loadAvailableSeats() {
         .order('seat_number');
 
     if (error) {
-        console.error('Error loading seats:', error);
+        console.error('Error loading barbers:', error);
         return;
     }
 
-    const seatSelect = document.getElementById('resSeat');
-    if (!seatSelect) return;
-
-    if (!seats || seats.length === 0) {
-        seatSelect.innerHTML = '<option value="">No seats available</option>';
-        return;
-    }
-
-    seatSelect.innerHTML = '<option value="">Select a Seat</option>' + 
-        seats.map(seat => {
-            const barberName = seat.tbl_barbers?.tbl_users 
-                ? `${seat.tbl_barbers.tbl_users.first_name} ${seat.tbl_barbers.tbl_users.last_name}`
-                : 'Unassigned';
-            
-            return `<option value="${seat.id}">Seat ${seat.seat_number} - ${barberName}</option>`;
-        }).join('');
+    allBarbers = data;
+    populateBarberDropdown();
 }
 
-function renderServiceMenu() {
-    const menuContainer = document.querySelector('.menu-container');
-    if (!menuContainer) return;
-    
-    menuContainer.innerHTML = `
-        <div class="menu-column" data-group="general" data-type="single">
-            <div class="category-header-small">GENERAL</div>
-            ${allServices.general.map(s => `
-                <div class="selectable" data-service-id="${s.id}" onclick="handleMenuSelect(this)">
-                    <h4>${s.name}</h4>
-                    <p>Price: ₱${s.price}</p>
-                </div>
-            `).join('')}
-        </div>
-        
-        <div class="menu-column" data-group="modern_cut" data-type="single">
-            <div class="category-header-small">MODERN CUT</div>
-            ${allServices.modern_cut.map(s => `
-                <div class="selectable" data-service-id="${s.id}" onclick="handleMenuSelect(this)">
-                    <h4>${s.name}</h4>
-                    <p>Price: ₱${s.price}</p>
-                </div>
-            `).join('')}
-        </div>
-        
-        <div class="menu-column" data-group="bossing" data-type="single">
-            <div class="category-header-small">BOSSING SERVICES</div>
-            ${allServices.bossing.map(s => `
-                <div class="selectable" data-service-id="${s.id}" onclick="handleMenuSelect(this)">
-                    <h4>${s.name}</h4>
-                    <p>Price: ₱${s.price}</p>
-                </div>
-            `).join('')}
-        </div>
-        
-        <div class="menu-column" data-type="multi">
-            <div class="category-header-small">ADD-ONS</div>
-            ${allServices.addons.map(s => `
-                <div class="selectable" data-service-id="${s.id}" onclick="handleMenuSelect(this)">
-                    <h4>${s.name}</h4>
-                    <p>Price: ₱${s.price}</p>
-                </div>
-            `).join('')}
-        </div>
-    `;
-}
+function populateBarberDropdown() {
+    const barberSelect = document.getElementById('barberSelect');
+    if (!barberSelect) return;
 
-window.handleMenuSelect = (element) => {
-    const serviceId = parseInt(element.dataset.serviceId);
-    const service = Object.values(allServices).flat().find(s => s.id === serviceId);
-    const column = element.closest('.menu-column');
-    const isSingle = column.dataset.type === 'single';
-
-    if (isSingle) {
-        // Remove the old base service from the array before adding the new one
-        selectedServices = selectedServices.filter(s => !s.can_be_base);
-
-        // Clear all base selection highlights
-        document.querySelectorAll('.menu-column[data-type="single"] .selectable').forEach(el => {
-            el.classList.remove('selected');
-        });
-
-        // If bossing, also clear all add-ons
-        if (service.service_type === 'bossing') {
-            selectedServices = selectedServices.filter(s => s.can_be_base);
-            document.querySelectorAll('.menu-column[data-type="multi"] .selectable').forEach(el => {
-                el.classList.remove('selected');
-            });
-        }
-
-        // Clicking the already-selected base service deselects it
-        if (element.classList.contains('selected')) {
-            element.classList.remove('selected');
-            return;
-        }
-
-        element.classList.add('selected');
-        selectedServices.push(service);
-    } else {
-        // Add-on toggle logic
-        if (element.classList.contains('selected')) {
-            element.classList.remove('selected');
-            selectedServices = selectedServices.filter(s => s.id !== serviceId);
-        } else {
-            element.classList.add('selected');
-            selectedServices.push(service);
-        }
-    }
-};
-
-window.confirmMenuSelection = function() {
-    if (selectedServices.length === 0) {
-        alert('Please select at least one service');
+    if (!allBarbers || allBarbers.length === 0) {
+        barberSelect.innerHTML = '<option value="">No barbers available</option>';
         return;
     }
-    
-    const baseService = selectedServices.find(s => s.can_be_base);
-    if (!baseService) {
-        alert('Please select a base service (General, Modern Cut, or Bossing)');
-        return;
-    }
-    
-    // Update service input
-    const serviceInput = document.getElementById('serviceInput');
-    const addons = selectedServices.filter(s => !s.can_be_base);
-    
-    let displayText = baseService.name;
-    if (addons.length > 0) {
-        displayText += ' + ' + addons.map(a => a.name).join(', ');
-    }
-    serviceInput.value = displayText;
-    
-    // Close modal
-    document.getElementById('serviceMenuOverlay').style.display = 'none';
-};
 
-async function loadUserReservations() {
-    const { data: reservations } = await supabase
-        .from('tbl_reservations')
-        .select(`
-            *,
-            tbl_seats (seat_number),
-            tbl_reservation_services (
-                is_base_service,
-                tbl_services (name)
-            )
-        `)
-        .eq('user_id', currentUser.id)
-        .in('status', ['pending', 'accepted', 'ongoing'])
-        .order('reserved_datetime', { ascending: false });
-    
-    displayReservations(reservations);
-}
-
-function displayReservations(reservations) {
-    const container = document.getElementById('reservationContainer');
-    if (!container) return;
-    
-    if (!reservations || reservations.length === 0) {
-        container.innerHTML = '<p style="text-align: center; padding: 40px;">No active reservations. Make your first one!</p>';
-        return;
-    }
-    
-    container.innerHTML = reservations.map(res => {
-        const baseService = res.tbl_reservation_services.find(s => s.is_base_service);
-        const addons = res.tbl_reservation_services.filter(s => !s.is_base_service);
-        const timeLeft = calculateTimeLeft(res.reserved_datetime);
+    let options = '<option value="">Select a barber</option>';
+    allBarbers.forEach(seat => {
+        const barberName = seat.tbl_barbers?.tbl_users 
+            ? `${seat.tbl_barbers.tbl_users.first_name} ${seat.tbl_barbers.tbl_users.last_name}`
+            : 'Unassigned';
         
-        return `
-            <div class="reservation-card">
-                <div class="bell-icon">🔔</div>
-                <div class="content-wrapper">
-                    <details>
-                        <summary><h2 class="service-title">${baseService?.tbl_services.name || 'Service'}</h2></summary>
-                        ${addons.length > 0 ? `
-                            <ul class="sub-services">
-                                ${addons.map(a => `<li>${a.tbl_services.name}</li>`).join('')}
-                            </ul>
-                        ` : ''}
-                    </details>
-                    <div class="meta-info">${new Date(res.reserved_date).toLocaleDateString()} ${res.reserved_time}<br>Seat: ${res.tbl_seats.seat_number}</div>
-                </div>
-                <div class="status-area">
-                    <div class="time-left">Time: ${timeLeft}</div>
-                    <div class="status-val">Status: <b class="status-${res.status}">${res.status}</b></div>
-                    <button class="btn-cancel" onclick="openCancelModal(this, ${res.id})">Cancel</button>
-                </div>
-            </div>
-        `;
-    }).join('');
-}
+        options += `<option value="${seat.id}" data-barber-id="${seat.barber_id}">
+            Seat ${seat.seat_number} - ${barberName}
+        </option>`;
+    });
 
-function calculateTimeLeft(datetime) {
-    const diff = new Date(datetime) - new Date();
-    const hours = Math.floor(diff / (1000 * 60 * 60));
-    return hours < 0 ? 'Past' : `${hours} hrs left`;
+    barberSelect.innerHTML = options;
 }
 
 function setupEventListeners() {
-    // Open reservation modal
-    document.getElementById('openReserve')?.addEventListener('click', () => {
-        document.getElementById('reserveOverlay').style.display = 'flex';
-    });
-    
-    // Open service menu when clicking service input
-    document.getElementById('serviceInput')?.addEventListener('click', () => {
-        document.getElementById('serviceMenuOverlay').style.display = 'flex';
-    });
-    
-    // Reserve now button
-    document.getElementById('reserveNowBtn')?.addEventListener('click', createReservation);
-    
-    // Setup logout
-    document.querySelector('.dropdown-item[href="login.html"]')?.addEventListener('click', async (e) => {
-        e.preventDefault();
-        await supabase.auth.signOut();
-        window.location.href = 'login.html';
+    const serviceSelect = document.getElementById('serviceSelect');
+    const modernCutOptions = document.getElementById('modernCutOptions');
+    const modernCutTypeSelect = document.getElementById('modernCutType');
+    const addonsSection = document.getElementById('addonsSection');
+    const termsBtn = document.getElementById('termsBtn');
+    const termsModal = document.getElementById('termsModal');
+    const closeModal = document.querySelector('.btn-close');
+    const modalBody = document.querySelector('.modal-body');
+    const agreeCheckbox = document.getElementById('agreeTerms');
+    const confirmBtn = document.getElementById('confirmBtn');
+    const viewListBtn = document.getElementById('viewListBtn');
+
+    if (serviceSelect) {
+        serviceSelect.addEventListener('change', (e) => {
+            const selectedOption = e.target.options[e.target.selectedIndex];
+            const serviceType = selectedOption.dataset.type;
+            const serviceValue = e.target.value;
+
+            if (serviceValue === 'modern_cut') {
+                selectedBaseService = null;
+                selectedModernCutType = null;
+                modernCutOptions.style.display = 'block';
+                addonsSection.style.display = 'block';
+                loadAddons('modern_cut');
+            } else if (serviceValue && serviceType === 'general') {
+                selectedBaseService = allServices.find(s => s.id == serviceValue);
+                selectedModernCutType = null;
+                modernCutOptions.style.display = 'none';
+                addonsSection.style.display = 'block';
+                loadAddons('general');
+            } else if (serviceValue && serviceType === 'bossing') {
+                selectedBaseService = allServices.find(s => s.id == serviceValue);
+                selectedModernCutType = null;
+                modernCutOptions.style.display = 'none';
+                addonsSection.style.display = 'none';
+                selectedAddons = [];
+            } else {
+                selectedBaseService = null;
+                selectedModernCutType = null;
+                modernCutOptions.style.display = 'none';
+                addonsSection.style.display = 'none';
+            }
+
+            calculateTotal();
+        });
+    }
+
+    if (modernCutTypeSelect) {
+        modernCutTypeSelect.addEventListener('change', (e) => {
+            const selectedType = e.target.value;
+            if (selectedType) {
+                const modernCutService = allServices.find(s => s.service_type === 'modern_cut' && s.can_be_base);
+                selectedBaseService = modernCutService;
+                selectedModernCutType = selectedType;
+            } else {
+                selectedBaseService = null;
+                selectedModernCutType = null;
+            }
+            calculateTotal();
+        });
+    }
+
+    if (termsBtn) {
+        termsBtn.addEventListener('click', () => {
+            termsModal.style.display = 'flex';
+            agreeCheckbox.disabled = true;
+            agreeCheckbox.checked = false;
+        });
+    }
+
+    if (closeModal) {
+        closeModal.addEventListener('click', () => {
+            termsModal.style.display = 'none';
+        });
+    }
+
+    if (modalBody) {
+        modalBody.addEventListener('scroll', () => {
+            const scrolledToBottom = modalBody.scrollHeight - modalBody.scrollTop <= modalBody.clientHeight + 10;
+            if (scrolledToBottom) {
+                agreeCheckbox.disabled = false;
+            }
+        });
+    }
+
+    if (agreeCheckbox) {
+        agreeCheckbox.addEventListener('change', (e) => {
+            confirmBtn.disabled = !e.target.checked;
+        });
+    }
+
+    if (confirmBtn) {
+        confirmBtn.addEventListener('click', handleReservationSubmit);
+    }
+
+    if (viewListBtn) {
+        viewListBtn.addEventListener('click', () => {
+            window.location.href = 'reservations-list.html';
+        });
+    }
+
+    window.addEventListener('click', (e) => {
+        if (e.target === termsModal) {
+            termsModal.style.display = 'none';
+        }
     });
 }
 
-async function createReservation() {
-    if (selectedServices.length === 0) {
-        alert('Please select services first');
+async function loadAddons(baseServiceType) {
+    const addonsContainer = document.getElementById('addonsContainer');
+    if (!addonsContainer) return;
+
+    const { data: addons, error } = await supabase
+        .from('tbl_services')
+        .select('*')
+        .eq('can_be_base', false)
+        .order('name');
+
+    if (error) {
+        console.error('Error loading add-ons:', error);
         return;
     }
-    
-    const recipientName = document.getElementById('recipientName')?.value.trim();
-    const datetime = document.getElementById('resDateTime').value;
-    const seatId = parseInt(document.getElementById('resSeat').value);
-    
-    if (!recipientName || !datetime || !seatId) {
-        alert('Please fill all fields');
+
+    if (!selectedBaseService && baseServiceType !== 'modern_cut') {
+        addonsContainer.innerHTML = '<p style="color: #666; font-style: italic; text-align: center;">Please select a base service first</p>';
         return;
     }
-    
-    const [date, time] = datetime.split('T');
-    const serviceIds = selectedServices.map(s => s.id);
-    
+
+    let availableAddons = addons;
+
+    if (baseServiceType === 'general') {
+        const includedAddons = selectedBaseService?.included_addons || [];
+        availableAddons = addons.filter(addon => !includedAddons.includes(addon.name));
+    } else if (baseServiceType === 'modern_cut') {
+        const modernCutService = allServices.find(s => s.service_type === 'modern_cut' && s.can_be_base);
+        const includedAddons = modernCutService?.included_addons || [];
+        availableAddons = addons.filter(addon => !includedAddons.includes(addon.name));
+    }
+
+    if (availableAddons.length === 0) {
+        addonsContainer.innerHTML = '<p style="color: #666; font-style: italic; text-align: center;">All add-ons are included in this service</p>';
+        return;
+    }
+
+    let html = '<div class="checkbox-group">';
+    availableAddons.forEach(addon => {
+        html += `
+            <label class="checkbox-label">
+                <input type="checkbox" 
+                       value="${addon.id}" 
+                       data-price="${addon.price}" 
+                       data-name="${addon.name}"
+                       onchange="window.handleAddonChange(this)">
+                <span>${addon.name} - ₱${addon.price}</span>
+            </label>
+        `;
+    });
+    html += '</div>';
+
+    addonsContainer.innerHTML = html;
+}
+
+window.handleAddonChange = function(checkbox) {
+    const addonId = parseInt(checkbox.value);
+    const addonPrice = parseFloat(checkbox.dataset.price);
+    const addonName = checkbox.dataset.name;
+
+    if (checkbox.checked) {
+        selectedAddons.push({ id: addonId, name: addonName, price: addonPrice });
+    } else {
+        selectedAddons = selectedAddons.filter(a => a.id !== addonId);
+    }
+
+    calculateTotal();
+};
+
+function calculateTotal() {
+    const totalDisplay = document.querySelector('.total-display span');
+    if (!totalDisplay) return;
+
+    let total = 0;
+
+    if (selectedBaseService) {
+        total += parseFloat(selectedBaseService.price);
+    }
+
+    selectedAddons.forEach(addon => {
+        total += addon.price;
+    });
+
+    totalDisplay.textContent = `₱${total.toFixed(2)}`;
+}
+
+async function handleReservationSubmit() {
+    const recipientName = document.getElementById('recipientName').value.trim();
+    const barberSelect = document.getElementById('barberSelect');
+    const timeInput = document.getElementById('timeInput');
+    const agreeCheckbox = document.getElementById('agreeTerms');
+
+    if (!recipientName) {
+        alert('Please enter the service recipient name');
+        return;
+    }
+
+    if (!selectedBaseService) {
+        alert('Please select a service');
+        return;
+    }
+
+    if (selectedBaseService.service_type === 'modern_cut' && !selectedModernCutType) {
+        alert('Please select a Modern Cut type');
+        return;
+    }
+
+    if (!barberSelect.value) {
+        alert('Please select a barber');
+        return;
+    }
+
+    if (!timeInput.value) {
+        alert('Please select a time');
+        return;
+    }
+
+    if (!agreeCheckbox.checked) {
+        alert('Please read and agree to the reservation rules');
+        return;
+    }
+
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, '0');
+    const day = String(today.getDate()).padStart(2, '0');
+    const reservedDate = `${year}-${month}-${day}`;
+
+    const serviceIds = [selectedBaseService.id];
+    selectedAddons.forEach(addon => {
+        serviceIds.push(addon.id);
+    });
+
+    const confirmBtn = document.getElementById('confirmBtn');
+    confirmBtn.disabled = true;
+    confirmBtn.textContent = 'Creating...';
+
     try {
         const { data, error } = await supabase.rpc('create_multi_service_reservation', {
             p_user_id: currentUser.id,
             p_service_recipient: recipientName,
             p_service_ids: serviceIds,
-            p_seat_id: seatId,
-            p_reserved_date: date,
-            p_reserved_time: time
+            p_seat_id: parseInt(barberSelect.value),
+            p_reserved_date: reservedDate,
+            p_reserved_time: timeInput.value
         });
-        
+
         if (error) throw error;
-        if (!data.success) throw new Error(data.error);
-        
-        alert('Reservation created!');
-        window.location.reload();
-        
+
+        if (!data.success) {
+            throw new Error(data.error || 'Failed to create reservation');
+        }
+
+        alert('Reservation created successfully!');
+        window.location.href = 'reservations-list.html';
+
     } catch (error) {
-        alert('Failed: ' + error.message);
+        console.error('Error creating reservation:', error);
+        alert('Failed to create reservation: ' + error.message);
+        confirmBtn.disabled = false;
+        confirmBtn.textContent = 'Confirm Reservation';
     }
 }
 
-window.openCancelModal = function(btn, reservationId) {
-    document.getElementById('cancelModalOverlay').style.display = 'flex';
-    document.getElementById('confirmCancelBtn').onclick = () => cancelReservation(reservationId);
-};
+function setupDropdown() {
+    const userProfile = document.querySelector('.user-profile');
+    const dropdown = document.querySelector('.dropdown-menu');
 
-window.closeCancelModal = function() {
-    document.getElementById('cancelModalOverlay').style.display = 'none';
-};
+    if (userProfile && dropdown) {
+        userProfile.addEventListener('click', (e) => {
+            e.stopPropagation();
+            dropdown.classList.toggle('show');
+        });
 
-async function cancelReservation(reservationId) {
-    const reason = document.getElementById('cancelReasonInput').value;
-    
-    try {
-        const { error } = await supabase
-            .from('tbl_reservations')
-            .update({ 
-                status: 'cancelled',
-                cancellation_reason: reason 
-            })
-            .eq('id', reservationId);
-        
-        if (error) throw error;
-        
-        alert('Reservation cancelled');
-        window.location.reload();
-        
-    } catch (error) {
-        alert('Failed: ' + error.message);
+        document.addEventListener('click', () => {
+            dropdown.classList.remove('show');
+        });
     }
 }
 
-window.openDetailsModal = () => document.getElementById('detailsOverlay').style.display = 'flex';
-window.closeDetailsModal = () => document.getElementById('detailsOverlay').style.display = 'none';
-
-function setupSignOut() {
-    document.getElementById('signOutLink').addEventListener('click', async (e) => {
-        e.preventDefault();
-        await supabase.auth.signOut();
-        localStorage.removeItem('currentUser');
-        window.location.href = 'login.html';
-    });
+async function setupSignOut() {
+    const signOutBtn = document.getElementById('signOutBtn');
+    if (signOutBtn) {
+        signOutBtn.addEventListener('click', async (e) => {
+            e.preventDefault();
+            await supabase.auth.signOut();
+            window.location.href = 'login.html';
+        });
+    }
 }
+
+setupDropdown();
+setupSignOut();

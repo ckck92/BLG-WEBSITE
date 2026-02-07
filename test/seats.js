@@ -35,19 +35,11 @@ async function initAuth() {
 
     // Populate nav based on role
     const nav = document.getElementById('mainNav');
-    if (userRole === 'admin') {
         nav.innerHTML = `
             <ul>
                 <li><a href="dashboard.html">Home</a></li>
-                <li><a href="#" class="active">View Live Seats</a></li>
-                <li><a href="admin-manage-reservations.html">Manage Reservations</a></li>
-            </ul>
-        `;
-    } else {
-        nav.innerHTML = `
-            <ul>
-                <li><a href="dashboard.html">Home</a></li>
-                <li><a href="#" class="active">View Live Seats</a></li>
+                <li><a href="reservations-list.html">Reservations List</a></li>
+                <li><a href="seats.html" class="active">View Live Seats</a></li>
                 <li><a href="history.html">Service History</a></li>
             </ul>
         `;
@@ -55,29 +47,18 @@ async function initAuth() {
 
     // Set legend based on role
     renderLegend();
-}
 
 function renderLegend() {
     const legend = document.getElementById('legendContainer');
-    
-    if (userRole === 'admin') {
-        // Admin sees simplified legend - just green seats always
-        legend.innerHTML = `
-            <div class="legend-item"><div class="dot green"></div> Available</div>
-            <div class="legend-item"><div class="dot red"></div> Occupied</div>
-            <div class="legend-item"><div class="dot gray"></div> Shop Closed</div>
-        `;
-    } else {
         // Client sees full legend
         legend.innerHTML = `
             <div class="legend-item"><div class="dot green"></div> Available</div>
             <div class="legend-item"><div class="dot blue"></div> Your Reservation</div>
             <div class="legend-item"><div class="dot brown"></div> Upcoming (&lt;30 min)</div>
-            <div class="legend-item"><div class="dot red"></div> Occupied</div>
+            <div class="legend-item"><div class="dot red"></div> Service Ongoing</div>
             <div class="legend-item"><div class="dot gray"></div> Shop Closed</div>
         `;
     }
-}
 
 async function loadSeats() {
     const now = new Date();
@@ -138,7 +119,7 @@ function renderSeatCard(seat, allReservations, isShopOpen, now) {
     let statusColor = 'text-green';
     let description = 'Ready for Reservation';
     let icon = '<i class="fa-regular fa-circle-check"></i>';
-    let buttonHtml = `<button class="btn-action" onclick="window.location.href='reservations.html'">Reserve</button>`;
+    let buttonHtml = ``;
     let warningHtml = '';
 
     // ADMIN LOGIC: Always show green unless shop closed or seat ongoing
@@ -166,7 +147,6 @@ function renderSeatCard(seat, allReservations, isShopOpen, now) {
                 statusColor = 'text-green';
                 description = 'Ready for Walk-ins or Reservations';
                 icon = '<i class="fa-regular fa-circle-check"></i>';
-                buttonHtml = '<button class="btn-action" onclick="window.location.href=\'admin-manage-reservations.html\'">Manage</button>';
             }
         }
     } 

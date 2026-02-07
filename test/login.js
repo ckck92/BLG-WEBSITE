@@ -63,7 +63,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // Redirect based on role
             if (profile.role === 'admin') {
                 console.log('Redirecting to admin dashboard');
-                window.location.href = 'dashboard.html'; // Admin dashboard
+                window.location.href = 'admin-dashboard.html'; // Admin dashboard
             } else if (profile.role === 'barber') {
                 alert('Barbers should use the Android app');
                 await supabase.auth.signOut();
@@ -79,4 +79,19 @@ document.addEventListener('DOMContentLoaded', () => {
             submitBtn.textContent = 'Sign In';
         }
     });
+
+        // Password Toggle Logic
+        document.getElementById('togglePassword').addEventListener('click', function() {
+            const pwd = document.getElementById('password');
+            const type = pwd.getAttribute('type') === 'password' ? 'text' : 'password';
+            pwd.setAttribute('type', type);
+            this.classList.toggle('fa-eye-slash');
+        });
+
+        document.getElementById('toggleConfirmPassword').addEventListener('click', function() {
+            const cpwd = document.getElementById('confirmPassword');
+            const type = cpwd.getAttribute('type') === 'password' ? 'text' : 'password';
+            cpwd.setAttribute('type', type);
+            this.classList.toggle('fa-eye-slash');
+        });
 });

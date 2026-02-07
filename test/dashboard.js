@@ -3,11 +3,11 @@ import { supabase } from './supabaseclient.js';
 console.log('Dashboard.js loaded');
 
 let currentUser = null;
+let countdownInterval = null;
 
 document.addEventListener('DOMContentLoaded', async () => {
-    console.log(' Dashboard DOM loaded');
+    console.log('Dashboard DOM loaded');
     await checkAuth();
-
 });
 
 async function checkAuth() {
@@ -17,7 +17,7 @@ async function checkAuth() {
         if (error) throw error;
         
         if (!session) {
-            console.log(' No session, redirecting to login');
+            console.log('No session, redirecting to login');
             window.location.href = 'login.html';
             return;
         }
@@ -39,6 +39,7 @@ async function checkAuth() {
         renderForRole();
         setupSignOut();
         setupDropdown();
+        setupNavigationCards(); // NEW: Setup click handlers for info cards
         
     } catch (error) {
         console.error('Auth check failed:', error);
@@ -55,52 +56,56 @@ function displayUserInfo() {
 
 function renderForRole() {
     const nav = document.getElementById('mainNav');
+    // Client Nav
+    nav.innerHTML = `
+        <ul>
+            <li><a href="dashboard.html" class="active">Home</a></li>
+            <li><a href="reservations-list.html">Reservations</a></li>
+            <li><a href="seats.html">Live Seats</a></li>
+            <li><a href="history.html">Service History</a></li>
+        </ul>
+    `;
 
-    if (currentUser.role === 'admin') {
-        console.log('🔄 Rendering admin dashboard');
+    // Show client UI
+    document.getElementById('clientDashboard').style.display = 'block';
 
-        // Admin Nav
-        nav.innerHTML = `
-            <ul>
-                <li><a href="dashboard.html" class="active">Home</a></li>
-                <li><a href="admin-service-history.html">Barbers Service History</a></li>
-                <li><a href="admin-logs.html">Logs</a></li>
-            </ul>
-        `;
+    // Load client data
+    loadClientReservations();
+    loadAnnouncements('client');
+}
 
-        // Show admin, hide client
-        document.getElementById('adminDashboard').style.display = 'block';
-        document.getElementById('clientDashboard').style.display = 'none';
+// NEW: Setup click handlers for navigation cards
+function setupNavigationCards() {
+    // Shop Schedule Card
+    const scheduleCard = document.getElementById('scheduleCard');
+    if (scheduleCard) {
+        scheduleCard.addEventListener('click', () => {
+            window.location.href = 'shop-schedule.html';
+        });
+    }
 
-        // Load admin data
-        loadAdminReservations();
-        loadAnnouncements('admin');
+    // Meet The Crew Card
+    const crewCard = document.getElementById('crewCard');
+    if (crewCard) {
+        crewCard.addEventListener('click', () => {
+            window.location.href = 'crew.html';
+        });
+    }
 
-    } else if (currentUser.role === 'client') {
-        console.log('🔄 Rendering client dashboard');
+    // Our Services Card
+    const servicesCard = document.getElementById('servicesCard');
+    if (servicesCard) {
+        servicesCard.addEventListener('click', () => {
+            window.location.href = 'services.html';
+        });
+    }
 
-        // Client Nav
-        nav.innerHTML = `
-            <ul>
-                <li><a href="dashboard.html" class="active">Home</a></li>
-                <li><a href="seats.html">View Live Seats</a></li>
-                <li><a href="history.html">Service History</a></li>
-            </ul>
-        `;
-
-        // Show client, hide admin
-        document.getElementById('clientDashboard').style.display = 'block';
-        document.getElementById('adminDashboard').style.display = 'none';
-
-        // Load client data
-        loadClientReservations();
-        loadAnnouncements('client');
-
-    } else {
-        // Barber or unknown — shouldn't be here
-        alert('Barbers should use the Android app.');
-        supabase.auth.signOut();
-        window.location.href = 'login.html';
+    // Recommended Haircuts / The Shop Card
+    const haircutsCard = document.getElementById('haircutsCard');
+    if (haircutsCard) {
+        haircutsCard.addEventListener('click', () => {
+            window.location.href = 'haircuts.html';
+        });
     }
 }
 
@@ -108,6 +113,12 @@ function renderForRole() {
 
 async function loadClientReservations() {
     try {
+        // Clear existing countdown interval
+        if (countdownInterval) {
+            clearInterval(countdownInterval);
+            countdownInterval = null;
+        }
+
         const now = new Date().toISOString();
         
         const { data: reservations, error } = await supabase
@@ -127,10 +138,6 @@ async function loadClientReservations() {
             .order('reserved_datetime', { ascending: true })
             .limit(1);
         
-        if (error) throw error;
-        
-        console.log('✅ Upcoming reservations loaded:', reservations);
-        
         const card = document.querySelector('#clientDashboard .reservation-card');
         
         if (!reservations || reservations.length === 0) {
@@ -139,7 +146,9 @@ async function loadClientReservations() {
                     <span class="title-text">No Upcoming Reservations</span>
                 </div>
                 <div class="description-text">
-                    <span class="text" style="color: #8b5a2b;"></a>
+                    <span class="text" style="color: #8b5a2b;">
+                        <a href="reservations.html" style="color: #4a2c0a; font-weight: 600;">Make a reservation now!</a>
+                    </span>
                 </div>
             `;
             return;
@@ -148,73 +157,83 @@ async function loadClientReservations() {
         const res = reservations[0];
         const baseService = res.tbl_reservation_services?.find(s => s.is_base_service);
         const serviceName = baseService?.tbl_services?.name || 'Service';
-        const timeLeft = calculateTimeLeft(res.reserved_datetime);
+        
+        const reservedDateTime = new Date(res.reserved_datetime);
+        const dateStr = reservedDateTime.toLocaleDateString('en-US', {
+            month: 'short',
+            day: 'numeric',
+            year: 'numeric'
+        });
+        const timeStr = reservedDateTime.toLocaleTimeString('en-US', {
+            hour: 'numeric',
+            minute: '2-digit',
+            hour12: true
+        });
         
         card.innerHTML = `
             <div class="card-top">
                 <span class="title-text">${serviceName}</span>
-                <span class="time-left">${timeLeft}</span>
+                <span class="time-left" id="dashboardCountdown">Calculating...</span>
             </div>
             <div class="description-text">
-                ${new Date(res.reserved_datetime).toLocaleDateString()} at ${res.reserved_time} - Seat ${res.tbl_seats.seat_number}
+                ${dateStr} at ${timeStr} - Seat ${res.tbl_seats.seat_number}
             </div>
         `;
+
+        // Start live countdown
+        startDashboardCountdown(reservedDateTime);
         
     } catch (error) {
-        console.error('Error loading client reservations:', error);
+        console.error('❌ Error loading client reservations:', error);
     }
 }
 
-//ADMIN DATA 
+function startDashboardCountdown(targetDateTime) {
+    const element = document.getElementById('dashboardCountdown');
+    if (!element) return;
 
-async function loadAdminReservations() {
-    try {
-        const { data: reservations, error } = await supabase
-            .from('tbl_reservations')
-            .select(`
-                *,
-                tbl_seats (seat_number),
-                tbl_reservation_services (
-                    id,
-                    is_base_service,
-                    tbl_services (name)
-                )
-            `)
-            .in('status', ['pending', 'accepted', 'ongoing'])
-            .order('reserved_datetime', { ascending: false })
-            .limit(5);
-        
-        if (error) throw error;
-        
-        console.log('Admin reservations loaded:', reservations);
-        
-        const card = document.getElementById('adminReservationsCard');
-        
-        if (!reservations || reservations.length === 0) {
-            card.innerHTML = `
-                <div class="card-top">
-                    <span class="title-text">No active reservations</span>
-                </div>
-            `;
-            return;
+    // Update immediately
+    updateDashboardCountdown(element, targetDateTime);
+
+    // Then update every second
+    countdownInterval = setInterval(() => {
+        updateDashboardCountdown(element, targetDateTime);
+    }, 1000);
+}
+
+function updateDashboardCountdown(element, targetDateTime) {
+    const now = new Date();
+    const diff = targetDateTime - now;
+
+    if (diff <= 0) {
+        element.textContent = 'Time has passed';
+        element.style.color = '#ef4444';
+        if (countdownInterval) {
+            clearInterval(countdownInterval);
+            countdownInterval = null;
         }
-        
-        card.innerHTML = reservations.map(res => {
-            const baseService = res.tbl_reservation_services?.find(s => s.is_base_service);
-            const serviceName = baseService?.tbl_services?.name || 'Service';
-            const timeLeft = calculateTimeLeft(res.reserved_datetime);
-            
-            return `
-                <div class="card-top" style="border-bottom: 1px solid #e0d5c7; padding-bottom: 8px; margin-bottom: 8px;">
-                    <span class="title-text">${serviceName} — Seat ${res.tbl_seats.seat_number}</span>
-                    <span class="time-left status-${res.status}">${res.status}</span>
-                </div>
-                <div class="description-text">${res.service_recipient} · ${res.reserved_time}</div>
-            `;
-        }).join('');
-        
-    } catch (error) {
-        console.error('Error loading admin reservations:', error);
+        return;
+    }
+
+    const hours = Math.floor(diff / (1000 * 60 * 60));
+    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+    const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+    // Format as HH:MM:SS
+    const formattedTime = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+    
+    element.textContent = formattedTime;
+
+    // Color coding based on time remaining
+    if (hours === 0 && minutes < 30) {
+        element.style.color = '#ef4444'; // Red - less than 30 minutes
+        element.style.fontWeight = '700';
+    } else if (hours < 2) {
+        element.style.color = '#f59e0b'; // Orange - less than 2 hours
+        element.style.fontWeight = '700';
+    } else {
+        element.style.color = '#10b981'; // Green - plenty of time
+        element.style.fontWeight = '600';
     }
 }
 
@@ -231,7 +250,7 @@ async function loadAnnouncements(role) {
         
         if (error) throw error;
         
-        console.log('Announcements loaded:', announcements);
+        console.log('✅ Announcements loaded:', announcements);
         
         const selector = role === 'admin' ? '#adminAnnouncementCard' : '#clientDashboard .announcement-card';
         const card = document.querySelector(selector);
@@ -250,48 +269,50 @@ async function loadAnnouncements(role) {
         `;
         
     } catch (error) {
-        console.error('Error loading announcements:', error);
+        console.error('❌ Error loading announcements:', error);
     }
-}
-
-function calculateTimeLeft(reservedDatetime) {
-    const now = new Date();
-    const reserved = new Date(reservedDatetime);
-    const diffMs = reserved - now;
-    const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
-    
-    if (diffHours < 0) return 'Past due';
-    if (diffHours === 0) {
-        const diffMinutes = Math.floor(diffMs / (1000 * 60));
-        return `${diffMinutes} mins left`;
-    }
-    if (diffHours < 24) return `${diffHours} hrs left`;
-    
-    const diffDays = Math.floor(diffHours / 24);
-    return `${diffDays} days left`;
 }
 
 function setupSignOut() {
-    document.getElementById('signOutLink').addEventListener('click', async (e) => {
-        e.preventDefault();
-        await supabase.auth.signOut();
-        localStorage.removeItem('currentUser');
-        window.location.href = 'login.html';
-    });
+    const signOutLink = document.getElementById('signOutLink');
+    if (signOutLink) {
+        signOutLink.addEventListener('click', async (e) => {
+            e.preventDefault();
+            
+            // Clear countdown interval
+            if (countdownInterval) {
+                clearInterval(countdownInterval);
+                countdownInterval = null;
+            }
+            
+            await supabase.auth.signOut();
+            localStorage.removeItem('currentUser');
+            window.location.href = 'login.html';
+        });
+    }
 }
     
 function setupDropdown() {
     const userIcon = document.getElementById('userIcon');
     const dropdown = document.getElementById('userDropdown');
 
-    userIcon.addEventListener('click', (e) => {
-        e.stopPropagation();
-        dropdown.classList.toggle('show');
-    });
+    if (userIcon && dropdown) {
+        userIcon.addEventListener('click', (e) => {
+            e.stopPropagation();
+            dropdown.classList.toggle('show');
+        });
 
-    document.addEventListener('click', (e) => {
-        if (!e.target.closest('.user-profile')) {
-            dropdown.classList.remove('show');
-        }
-    });
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.user-profile')) {
+                dropdown.classList.remove('show');
+            }
+        });
+    }
 }
+
+// Cleanup interval when page unloads
+window.addEventListener('beforeunload', () => {
+    if (countdownInterval) {
+        clearInterval(countdownInterval);
+    }
+});

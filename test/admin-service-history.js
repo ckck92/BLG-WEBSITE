@@ -1,12 +1,18 @@
 import { supabase } from './supabaseclient.js';
 
 let currentUser = null;
+let currentPage = 1;
+let totalPages = 1;
+const itemsPerPage = 5;
+let allHistory = [];
+let filteredHistory = [];
 
 document.addEventListener('DOMContentLoaded', async () => {
     await initAuth();
     setupDropdown();
     setupSignOut();
-    loadServiceHistory();
+    await loadBarbers();
+    await loadServiceHistory();
 });
 
 async function initAuth() {
@@ -32,6 +38,23 @@ async function initAuth() {
     document.getElementById('userName').textContent = `Hi, ${currentUser.first_name}`;
 }
 
+async function loadBarbers() {
+    const { data: barbers } = await supabase
+        .from('tbl_barbers')
+        .select('id, tbl_users (first_name, last_name)')
+        .order('id');
+
+    const select = document.getElementById('barberFilter');
+    if (barbers) {
+        barbers.forEach(barber => {
+            const option = document.createElement('option');
+            option.value = barber.id;
+            option.textContent = `${barber.tbl_users.first_name} ${barber.tbl_users.last_name}`;
+            select.appendChild(option);
+        });
+    }
+}
+
 async function loadServiceHistory() {
     const { data: reservations, error } = await supabase
         .from('tbl_reservations')
@@ -39,7 +62,6 @@ async function loadServiceHistory() {
             id,
             service_recipient,
             user_id,
-            seat_id,
             barber_id,
             reserved_date,
             reserved_time,
@@ -48,8 +70,8 @@ async function loadServiceHistory() {
             status,
             total_price,
             tbl_users!tbl_reservations_user_id_fkey (first_name, last_name),
-            tbl_seats (seat_number),
             tbl_barbers!tbl_reservations_barber_id_fkey (
+                id,
                 user_id,
                 tbl_users (first_name, last_name)
             ),
@@ -66,14 +88,89 @@ async function loadServiceHistory() {
         return;
     }
 
+    allHistory = reservations || [];
+    filteredHistory = [...allHistory];
+    updatePagination();
+    displayCurrentPage();
+}
+
+window.applyFilters = function() {
+    const barberId = document.getElementById('barberFilter').value;
+    const dateFilter = document.getElementById('dateFilter').value;
+    const minPrice = parseFloat(document.getElementById('minPrice').value) || 0;
+    const maxPrice = parseFloat(document.getElementById('maxPrice').value) || Infinity;
+
+    filteredHistory = allHistory.filter(res => {
+        // Barber filter
+        if (barberId && res.barber_id !== parseInt(barberId)) return false;
+        
+        // Date filter
+        if (dateFilter) {
+            const completedDate = new Date(res.completed_at).toISOString().split('T')[0];
+            if (completedDate !== dateFilter) return false;
+        }
+        
+        // Price range filter
+        const price = parseFloat(res.total_price);
+        if (price < minPrice || price > maxPrice) return false;
+        
+        return true;
+    });
+
+    currentPage = 1;
+    updatePagination();
+    displayCurrentPage();
+};
+
+window.resetFilters = function() {
+    document.getElementById('barberFilter').value = '';
+    document.getElementById('dateFilter').value = '';
+    document.getElementById('minPrice').value = '';
+    document.getElementById('maxPrice').value = '';
+    
+    filteredHistory = [...allHistory];
+    currentPage = 1;
+    updatePagination();
+    displayCurrentPage();
+};
+
+function updatePagination() {
+    totalPages = Math.ceil(filteredHistory.length / itemsPerPage) || 1;
+    document.getElementById('pageInfo').textContent = `Page ${currentPage} / ${totalPages}`;
+}
+
+window.changePage = function(direction) {
+    switch(direction) {
+        case 'first':
+            currentPage = 1;
+            break;
+        case 'prev':
+            if (currentPage > 1) currentPage--;
+            break;
+        case 'next':
+            if (currentPage < totalPages) currentPage++;
+            break;
+        case 'last':
+            currentPage = totalPages;
+            break;
+    }
+    displayCurrentPage();
+    updatePagination();
+};
+
+function displayCurrentPage() {
+    const start = (currentPage - 1) * itemsPerPage;
+    const end = start + itemsPerPage;
+    const pageData = filteredHistory.slice(start, end);
+    
     const tbody = document.querySelector('#historyTable tbody');
     
-    if (!reservations || reservations.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 40px; color: #999;">No completed services yet</td></tr>';
+    if (pageData.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 40px; color: #999;">No completed services found</td></tr>';
         return;
     }
 
-    tbody.innerHTML = reservations.map(res => {
+    tbody.innerHTML = pageData.map(res => {
         const baseService = res.tbl_reservation_services?.find(s => s.is_base_service);
         const addons = res.tbl_reservation_services?.filter(s => !s.is_base_service) || [];
         
@@ -82,11 +179,17 @@ async function loadServiceHistory() {
             serviceDetails += ' + ' + addons.map(a => a.tbl_services.name).join(', ');
         }
 
+        const clientName = res.tbl_users 
+            ? `${res.tbl_users.first_name} ${res.tbl_users.last_name}`
+            : 'Unknown User';
+
+        const barberName = res.tbl_barbers?.tbl_users
+            ? `${res.tbl_barbers.tbl_users.first_name} ${res.tbl_barbers.tbl_users.last_name}`
+            : 'Unassigned';
+
         const dateTime = res.completed_at 
             ? new Date(res.completed_at) 
-            : (res.reserved_datetime 
-                ? new Date(res.reserved_datetime) 
-                : new Date(`${res.reserved_date}T${res.reserved_time}`));
+            : new Date(res.reserved_datetime);
             
         const dateStr = dateTime.toLocaleDateString('en-US', {
             month: 'long',
@@ -99,28 +202,14 @@ async function loadServiceHistory() {
             hour12: true
         });
 
-        const clientName = res.tbl_users 
-            ? `${res.tbl_users.first_name} ${res.tbl_users.last_name}`
-            : 'Unknown User';
-
-        const barberName = res.tbl_barbers?.tbl_users
-            ? `${res.tbl_barbers.tbl_users.first_name} ${res.tbl_barbers.tbl_users.last_name}`
-            : 'Unassigned';
-
         return `
             <tr>
                 <td><strong>${res.service_recipient}</strong></td>
                 <td>${clientName}</td>
-                <td>Seat ${res.tbl_seats.seat_number}</td>
                 <td><strong>${barberName}</strong></td>
                 <td>${serviceDetails}</td>
                 <td><strong>₱${res.total_price}</strong></td>
                 <td>${dateStr}<br><small style="color: #666;">${timeStr}</small></td>
-                <td>
-                    <span class="status-badge status-completed">
-                        <i class="fa-solid fa-circle-check"></i> Complete
-                    </span>
-                </td>
             </tr>
         `;
     }).join('');

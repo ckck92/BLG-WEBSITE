@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Boss Lupit Gupit - Profile</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="profile.css">
+    <link rel="icon" type="image/png" href="blgcircle.png">
+</head>
+<body>
+
+    <div class="header-bg">
+        <span id="backBtn" class="back-arrow">←</span>
+        <img src="blgletterwhite.png" alt="Logo" class="header-logo-img">
+        <div class="logo-text">BOSS LUPIT GUPIT</div>
+    </div>
+
+    <div class="avatar-container">
+        <div class="avatar-white-bg">
+            <div class="avatar-inner-brown">
+                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                </svg>
+            </div>
+        </div>
+        <div class="user-greeting">Hi, user123!</div>
+    </div>
+
+    <div class="profile-container">
+        <div class="profile-card">
+            <div class="profile-header" id="profileHeader">
+                <h2>Profile</h2>
+                <span id="arrow" class="arrow-icon">▲</span>
+            </div>
+
+            <div id="details" class="details-content">
+                <div class="info-group">
+                    <span class="label">Email</span>
+                    <span class="value">user123@gmail.com</span>
+                </div>
+                <div class="info-group">
+                    <span class="label">Birth Date</span>
+                    <span class="value">1/2/3456</span>
+                </div>
+                <div class="info-group">
+                    <span class="label">Gender</span>
+                    <span class="value">Male</span>
+                </div>
+                <div class="info-group">
+                    <span class="label">Contact Number</span>
+                    <span class="value">09876543211</span>
+                </div>
+                <span class="edit-btn" id="openEditModal">Edit</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="edit-profile-modal">
+            <h2>Edit Profile</h2>
+            <form id="editForm">
+                <input type="text" placeholder="User123" value="User123">
+                <input type="email" placeholder="user123@gmail.com" value="user123@gmail.com">
+                <input type="text" placeholder="1/2/3456" value="1/2/3456">
+                <input type="text" placeholder="Male" value="Male">
+                <input type="text" placeholder="Contact Number">
+                
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-back" id="closeModalBtn">Back</button>
+                    <button type="submit" class="btn btn-update">Update</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="profile.js"></script>
+</body>
+</html>

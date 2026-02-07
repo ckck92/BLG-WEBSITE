@@ -1,0 +1,132 @@
+:root {
+    --brand-brown: #5d3a00;
+    --text-dark: #333;
+    --text-gray: #555;
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #ffffff;
+    color: var(--text-dark);
+    line-height: 1.6;
+}
+
+.hero-section {
+    height: 350px;
+    background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), 
+                url('the-shop-cover.png'); 
+    background-size: cover;
+    background-position: center;
+    position: relative;
+    display: flex;
+    align-items: flex-start; 
+    padding: 20px 25px;
+    box-sizing: border-box;
+}
+
+.back-arrow {
+    color: white;
+    font-size: 30px;
+    text-decoration: none;
+    cursor: pointer;
+    z-index: 10; 
+    line-height: 1;
+    transition: transform 0.2s;
+}
+
+.back-arrow:hover {
+    transform: scale(1.2);
+}
+
+.hero-logo-container {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    white-space: nowrap;
+    z-index: 5;
+}
+
+.hero-logo-img {
+    height: 45px;
+    width: auto;
+    object-fit: contain;
+}
+
+.hero-title {
+    color: white;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-size: 1.2rem;
+}
+
+.content-container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 40px 25px;
+}
+
+h1 {
+    color: var(--brand-brown);
+    font-size: 2.2rem;
+    font-weight: 700;
+    margin-bottom: 20px;
+}
+
+.description p {
+    font-size: 1rem;
+    color: var(--text-dark);
+    margin-bottom: 15px;
+    text-align: justify;
+}
+
+.operation-times {
+    margin-top: 30px;
+}
+
+.operation-times h3 {
+    font-weight: 700;
+    margin-bottom: 5px;
+}
+
+.time-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.time-list li {
+    font-size: 0.95rem;
+    margin-bottom: 3px;
+}
+
+.contact-footer {
+    text-align: right;
+    margin-top: 50px;
+    border-top: 1px solid #eee;
+    padding-top: 20px;
+}
+
+.contact-footer strong {
+    display: block;
+    font-size: 1.1rem;
+    margin-bottom: 5px;
+}
+
+.contact-footer p {
+    margin: 2px 0;
+    font-size: 0.9rem;
+    color: var(--text-dark);
+}
+
+@media (max-width: 600px) {
+    .hero-section { height: 250px; }
+    .hero-title { font-size: 1rem; }
+    .hero-logo-img { height: 35px; }
+    .contact-footer { text-align: center; }
+}

@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Barber Check-In - Boss Lupit Gupit</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="barber-attendance.css">
+</head>
+<body>
+    <div class="container">
+        <div class="checkin-card">
+            <div class="header">
+                <i class="fa-solid fa-user-check"></i>
+                <h1>Barber Daily Check-In</h1>
+                <p>Enter your 8-digit UID to mark attendance</p>
+            </div>
+
+            <div class="input-section">
+                <label for="barberUid">
+                    <i class="fa-solid fa-fingerprint"></i> Your UID
+                </label>
+                <input 
+                    type="text" 
+                    id="barberUid" 
+                    placeholder="12345678"
+                    maxlength="8"
+                    pattern="[0-9]{8}"
+                    inputmode="numeric"
+                    autofocus>
+                <small class="hint">8-digit number provided by admin</small>
+            </div>
+
+            <button id="checkinBtn" class="btn-checkin">
+                <i class="fa-solid fa-check-circle"></i>
+                Check In
+            </button>
+
+            <div id="message" class="message"></div>
+
+            <div class="info-box">
+                <i class="fa-solid fa-info-circle"></i>
+                <div>
+                    <strong>First time?</strong> Ask your admin for your unique 8-digit UID.
+                    You'll use this same UID every day to check in.
+                </div>
+            </div>
+
+            <div class="recent-checkins" id="recentCheckins" style="display: none;">
+                <h3>Recent Check-Ins Today</h3>
+                <div id="checkinList"></div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="barber-attendance.js"></script>
+</body>
+</html>

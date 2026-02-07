@@ -5,46 +5,79 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Service History - Boss Lupit Gupit</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="history.css">
-    <link rel="icon" type="image/png" href="blgcircle.png">
 </head>
 <body>
-
-    <header class="navbar">
-        <a href="dashboard.html" class="logo">
-            <img src="blgletterwhite.png" alt="logo"> BOSS LUPIT GUPIT
-        </a>
-        <nav>
-            <ul>
-                <li><a href="dashboard.html">Home</a></li>
-                <li><a href="seats.html">View Live Seats</a></li>
-                <li><a href="#" class="active">Service History</a></li>
-            </ul>
-        </nav>
-        
-        <div class="user-profile" id="userProfileContainer">
-            <span id="userName">Hi, user</span>
-            <i class="fa-solid fa-circle-user fa-2xl" id="userIcon"></i>
-            
-            <div class="dropdown-menu" id="userDropdown">
-                <a href="#" class="dropdown-item" id="signOutLink">
-                    <i class="fa-solid fa-right-from-bracket"></i> Sign Out
-                </a>
+    <header>
+        <div class="navbar">
+            <div class="logo">
+                <h2>Boss Lupit Gupit</h2>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="dashboard.html">Home</a></li>
+                    <li><a href="reservations-list.html">Reservations</a></li>
+                    <li><a href="seats.html">Live Seats</a></li>
+                    <li><a href="history.html">Service History</a></li>
+                </ul>
+            </nav>
+            <div class="user-profile">
+                <i class="fa-solid fa-user"></i>
+                <div class="dropdown">
+                    <a href="#" id="signOutBtn">Sign Out</a>
+                </div>
             </div>
         </div>
     </header>
 
-    <main class="container">
-        <div class="page-header">
-            <button class="back-btn" onclick="window.location.href='dashboard.html'">
-                <i class="fa-solid fa-arrow-left"></i>
-            </button>
-            <h1>My Service History</h1>
+    <main class="history-container">
+        <div class="history-header">
+            <div class="back-arrow">
+                <a href="dashboard.html">
+                    <i class="fa-solid fa-arrow-left"></i>
+                </a>
+            </div>
+            <h1><i class="fa-solid fa-history"></i> Service History</h1>
+            <p>Your completed services</p>
         </div>
 
-        <div class="table-wrapper">
-            <table id="historyTable">
+        <!-- Filters Section -->
+        <div class="filters-section">
+            <div class="filter-group">
+                <label for="filterRecipient">
+                    <i class="fa-solid fa-user"></i> Service Recipient
+                </label>
+                <input type="text" 
+                       id="filterRecipient" 
+                       placeholder="Search by recipient name...">
+            </div>
+
+            <div class="filter-group">
+                <label for="filterBarber">
+                    <i class="fa-solid fa-scissors"></i> Barber
+                </label>
+                <select id="filterBarber">
+                    <option value="">All Barbers</option>
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <label for="filterDate">
+                    <i class="fa-solid fa-calendar"></i> Date Completed
+                </label>
+                <input type="date" id="filterDate">
+            </div>
+
+            <div class="filter-actions">
+                <button id="resetFilters" class="reset-btn">
+                    <i class="fa-solid fa-rotate-right"></i> Reset
+                </button>
+            </div>
+        </div>
+
+        <!-- History Table -->
+        <div class="table-container">
+            <table class="history-table">
                 <thead>
                     <tr>
                         <th>Service Recipient</th>
@@ -55,18 +88,31 @@
                         <th>Date Completed</th>
                     </tr>
                 </thead>
-                <tbody>
-                    <tr><td colspan="6" style="text-align: center; padding: 40px;">Loading...</td></tr>
+                <tbody id="historyTableBody">
+                    <tr>
+                        <td colspan="6" style="text-align: center; padding: 40px;">
+                            <i class="fa-solid fa-spinner fa-spin"></i> Loading...
+                        </td>
+                    </tr>
                 </tbody>
             </table>
         </div>
 
+        <!-- Pagination -->
         <div class="pagination">
-            <button class="page-btn"><i class="fa-solid fa-angles-left"></i></button>
-            <button class="page-btn"><i class="fa-solid fa-chevron-left"></i></button>
-            <span class="page-info">Page 1 / 30</span>
-            <button class="page-btn"><i class="fa-solid fa-chevron-right"></i></button>
-            <button class="page-btn"><i class="fa-solid fa-angles-right"></i></button>
+            <button id="firstPage" class="page-btn">
+                <i class="fa-solid fa-angles-left"></i> First
+            </button>
+            <button id="prevPage" class="page-btn">
+                <i class="fa-solid fa-chevron-left"></i> Prev
+            </button>
+            <span id="paginationInfo" class="page-info">Page 1</span>
+            <button id="nextPage" class="page-btn">
+                Next <i class="fa-solid fa-chevron-right"></i>
+            </button>
+            <button id="lastPage" class="page-btn">
+                Last <i class="fa-solid fa-angles-right"></i>
+            </button>
         </div>
     </main>
 

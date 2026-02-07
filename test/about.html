@@ -6,59 +6,252 @@
     <title>Boss Lupit Gupit - About Us</title>
     <link rel="stylesheet" href="about.css">
     <link rel="icon" type="image/png" href="R5.png">
-</head>
-<body>
+    </head>
+    <body>
 
-    <header>
-        <a href="welcome.html" class="logo-container">
-            <img src="R2.png" alt="BLG Logo" class="logo-img">
-            <span class="brand-name">Boss Lupit Gupit</span>
-        </a>
+        <header>
+            <a href="welcome.html" class="logo-container">
+                <img src="R2.png" alt="BLG Logo" class="logo-img">
+                <span class="brand-name">Boss Lupit Gupit</span>
+            </a>
 
-        <a href="login.html" class="auth-container">
-            <span>Sign In</span>
-            <div class="user-icon">
-                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
-                </svg>
-            </div>
-        </a>
-    </header>
+            <a href="login.html" class="auth-container">
+                <span>Sign In</span>
+                <div class="user-icon">
+                    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                    </svg>
+                </div>
+            </a>
+        </header>
 
-    <main>
-        <div class="content-wrapper">
-            <img src="R5.png" alt="Barber Tools" class="about-image">
+        <main>
+            <div class="content-wrapper">
+                <img src="R5.png" alt="Barber Tools" class="about-image">
 
-            <div class="text-content">
-                <h1>About Us</h1>
-                
-                <p>
-                    Apart from the standard barbershop services we offer, we believe that the act 
-                    of self-care is only getting more important. Through years of service, we have 
-                    collected valuable feedback and data from customers interested and have in 
-                    self-care.
-                </p>
-
-                <p>
-                    In return, we provide back to customers by giving valuable self-care guidance to 
-                    our customers in each barbershop session. We do this because we value every 
-                    customer that trusts us our service. With trust, we do everything in our hands to 
-                    provide satisfactory service, boost customer confidence, and make you 
-                    interested in the self-care journey with proper guidance.
-                </p>
-
-                <p>Reach out to us via phone number at <b>09527855433</b> or via gmail <b>blgcuts@gmail.com</b> for more inquiries!</p>
-
-                <div class="btn-container">
-                    <a href="register.html" class="btn">Register</a>
+                <div class="text-content">
+                    <h1>About Us</h1>
+                    <p>Apart from the standard barbershop services we offer, we believe that the act of self-care is only getting more important. Through years of service, we have collected valuable feedback and data from customers interested and have in self-care.</p>
+                    <p>In return, we provide back to customers by giving valuable self-care guidance to our customers in each barbershop session. We do this because we value every customer that trusts us our service. With trust, we do everything in our hands to provide satisfactory service, boost customer confidence, and make you interested in the self-care journey with proper guidance.</p>
+                    <p>Reach out to us via phone number at <b>09527855433</b> or via gmail <b>blgcuts@gmail.com</b> for more inquiries!</p>
+                    <div class="btn-container">
+                        <a href="register.html" class="btn">Register</a>
+                    </div>
                 </div>
             </div>
-        </div>
-    </main>
 
-    <img src="R10.png" alt="Decoration" class="bg-deco-left">
-    <img src="R11.png" alt="Decoration" class="bg-deco-right">
+            <div class="category-section">
+                <div class="category-header">
+                    <h2 class="category-title">Haircut Styles</h2>
+                    <div class="nav-arrows">
+                        <button class="arrow" onclick="scrollSlider(-1)">&#10094;</button>
+                        <button class="arrow" onclick="scrollSlider(1)">&#10095;</button>
+                    </div>
+                </div>
 
-    <script src="about.js"></script>
-</body>
+                <div class="category-container" id="categorySlider">
+                    <div class="category-card">
+                        <div class="img-box"><img src="img/round-sample.jpg" alt="round" style="border-radius: 20px;"></div>
+                        <div class="cat-label">FOR ROUND FACE</div>
+                    </div>
+                    <div class="category-card">
+                        <div class="img-box"><img src="img/oval-sample.jpg" alt="oval" style="border-radius: 20px;"></div>
+                        <div class="cat-label">FOR OVAL FACE</div>
+                    </div>
+                    <div class="category-card">
+                        <div class="img-box"><img src="img/heart-sample.png" alt="heart" style="border-radius: 20px;"></div>
+                        <div class="cat-label">FOR HEART FACE</div>
+                    </div>
+                    <div class="category-card">
+                        <div class="img-box"><img src="img/long-sample.png.jpg" alt="long" style="border-radius: 20px;"></div>
+                        <div class="cat-label">FOR LONG FACE</div>
+                    </div>
+                    <div class="category-card">
+                        <div class="img-box"><img src="img/square-sample.jpg" alt="square" style="border-radius: 20px;"></div>
+                        <div class="cat-label">FOR SQUARE FACE</div>
+                    </div>
+                    <div class="category-card">
+                        <div class="img-box"><img src="img/diamond-sample.jpg" alt="diamond" style="border-radius: 20px;"></div>
+                        <div class="cat-label">FOR DIAMOND FACE</div>
+                    </div>
+                    <div class="category-card">
+                        <div class="img-box"><img src="img/triangle-sample.jpg" alt="triangle" style="border-radius: 20px;"></div>
+                        <div class="cat-label">FOR TRIANGLE FACE</div>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="widget-container">
+                <div class="category-header"><h2 class="category-title">What our Customers Say</h2></div>
+
+                <div class="tabs">
+                    <div class="tab-item active" style="color: #6D3B0E;">All Reviews 4.8</div>
+                </div>
+
+                <button class="nav-arrow" id="prevBtn" disabled>❮</button>
+                
+                <div class="carousel-view">
+                    <div class="reviews-track" id="track">
+                        <div class="review-card">
+                            <div class="stars">★★★★★</div>
+                            <p class="review-text">Great Service</p>
+                            <div class="user-profile">
+                                <div class="avatar-wrapper"><div class="avatar" style="background:#4A90E2"></div><div class="platform-icon">G</div></div>
+                                <div class="user-name">Ryan</div>
+                                <div class="time-ago">7 hours ago</div>
+                            </div>
+                        </div>
+                        <div class="review-card">
+                            <div class="stars">★★★★★</div>
+                            <p class="review-text">Must try barbershop!</p>
+                            <div class="user-profile">
+                                <div class="avatar-wrapper"><div class="avatar" style="background:#50E3C2"></div><div class="platform-icon">G</div></div>
+                                <div class="user-name">Benedict</div>
+                                <div class="time-ago">23 hours ago</div>
+                            </div>
+                        </div>
+                        <div class="review-card">
+                            <div class="stars">★★★★★</div>
+                            <p class="review-text">I love the massage!</p>
+                            <div class="user-profile">
+                                <div class="avatar-wrapper"><div class="avatar" style="background:#F5A623"></div><div class="platform-icon">G</div></div>
+                                <div class="user-name">Johnathan</div>
+                                <div class="time-ago">1 day ago</div>
+                            </div>
+                        </div>
+                        <div class="review-card">
+                            <div class="stars">★★★★★</div>
+                            <p class="review-text">WIll return!</p>
+                            <div class="user-profile">
+                                <div class="avatar-wrapper"><div class="avatar" style="background:#D0021B"></div><div class="platform-icon">G</div></div>
+                                <div class="user-name">Nikolai</div>
+                                <div class="time-ago">2 days ago</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <button class="nav-arrow" id="nextBtn">❯</button>
+
+                <div class="dots" id="dotContainer"></div>
+            </div>
+
+        </main>
+
+        <img src="R10.png" alt="Decoration" class="bg-deco-left">
+        <img src="R11.png" alt="Decoration" class="bg-deco-right">
+
+        <script>
+            function scrollSlider(direction) {
+                const slider = document.getElementById('categorySlider');
+                const scrollAmount = 265; 
+                slider.scrollBy({
+                    left: direction * scrollAmount,
+                    behavior: 'smooth'
+                });
+            }
+
+        const track = document.getElementById('track');
+    const nextBtn = document.getElementById('nextBtn');
+    const prevBtn = document.getElementById('prevBtn');
+    const cards = document.querySelectorAll('.review-card');
+    const dotContainer = document.getElementById('dotContainer');
+    const widgetContainer = document.querySelector('.widget-container');
+
+    let currentIndex = 0;
+    let startX = 0;
+    let autoPlayTimer;
+
+    function getCardsToShow() {
+        return window.innerWidth > 768 ? 3 : 1;
+    }
+
+    function getMaxIndex() {
+        return Math.max(0, cards.length - getCardsToShow());
+    }
+
+    function createDots() {
+        dotContainer.innerHTML = '';
+        const maxIdx = getMaxIndex();
+        for (let i = 0; i <= maxIdx; i++) {
+            const dot = document.createElement('div');
+            dot.classList.add('dot');
+            if (i === currentIndex) dot.classList.add('active');
+            dot.addEventListener('click', () => {
+                goToSlide(i);
+                resetAutoPlay();
+            });
+            dotContainer.appendChild(dot);
+        }
+    }
+
+    function updateCarousel() {
+        const cardsToShow = getCardsToShow();
+        const movePercentage = (100 / cardsToShow) * currentIndex;
+        const gapAdjustment = (20 * currentIndex) / cardsToShow;
+        
+        track.style.transform = `translateX(calc(-${movePercentage}% - ${gapAdjustment}px))`;
+        
+        prevBtn.disabled = currentIndex === 0;
+        nextBtn.disabled = currentIndex >= getMaxIndex();
+
+        const dots = document.querySelectorAll('.dot');
+        dots.forEach((dot, i) => dot.classList.toggle('active', i === currentIndex));
+    }
+
+    // Auto-Play Logic
+    function startAutoPlay() {
+        stopAutoPlay(); // Clear any existing timers
+        autoPlayTimer = setInterval(() => {
+            if (currentIndex >= getMaxIndex()) {
+                goToSlide(0); // Loop back to start
+            } else {
+                goToSlide(currentIndex + 1);
+            }
+        }, 5000); // 5 seconds
+    }
+
+    function stopAutoPlay() {
+        clearInterval(autoPlayTimer);
+    }
+
+    function resetAutoPlay() {
+        stopAutoPlay();
+        startAutoPlay();
+    }
+
+    // Event Listeners
+    nextBtn.addEventListener('click', () => {
+        goToSlide(currentIndex + 1);
+        resetAutoPlay();
+    });
+
+    prevBtn.addEventListener('click', () => {
+        goToSlide(currentIndex - 1);
+        resetAutoPlay();
+    });
+
+    // Pause when mouse enters, resume when it leaves
+    widgetContainer.addEventListener('mouseenter', stopAutoPlay);
+    widgetContainer.addEventListener('mouseleave', startAutoPlay);
+
+    function goToSlide(index) {
+        currentIndex = Math.min(Math.max(index, 0), getMaxIndex());
+        updateCarousel();
+    }
+
+    window.addEventListener('resize', () => {
+        currentIndex = Math.min(currentIndex, getMaxIndex());
+        createDots();
+        updateCarousel();
+    });
+
+    // Initialize
+    createDots();
+    updateCarousel();
+    startAutoPlay();
+        </script>
+        <script src="about.js"></script>
+    </body>
 </html>

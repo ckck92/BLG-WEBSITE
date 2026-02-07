@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Reservation List - Boss Lupit Gupit</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="reservations-list.css">
+    <link rel="icon" type="image/png" href="blgcircle.png">
+</head>
+<body>
+
+    <header class="navbar">
+        <a href="dashboard.html" class="logo">
+            <img src="blgletterwhite.png" alt="logo"> BOSS LUPIT GUPIT
+        </a>
+        <nav>
+            <ul>
+                <li><a href="dashboard.html">Home</a></li>
+                <li><a href="reservations-list.html" class="active">Reservations List</a></li>
+                <li><a href="seats.html">View Live Seats</a></li>
+                <li><a href="history.html">Service History</a></li>
+            </ul>
+        </nav>
+        
+        <div class="user-profile" id="userProfileContainer">
+            <span id="userName">Hi, user</span>
+            <i class="fa-solid fa-circle-user fa-2xl" id="userIcon"></i>
+            
+            <div class="dropdown-menu" id="userDropdown">
+                <a href="#" class="dropdown-item" id="signOutLink">
+                    <i class="fa-solid fa-right-from-bracket"></i> Sign Out
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+        <div class="page-header">
+            <button class="back-btn" onclick="window.location.href='dashboard.html'">
+                <i class="fa-solid fa-arrow-left"></i>
+            </button>
+            <div>
+                <h1>Your Reservation List</h1>
+                <p class="subtitle">View and manage your active reservations</p>
+            </div>
+        </div>
+
+        <div id="reservationsContainer">
+            <p style="text-align: center; padding: 40px; color: #999;">Loading...</p>
+        </div>
+    </main>
+
+    <!-- Cancel Modal -->
+    <div class="modal-overlay" id="cancelModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Cancel Reservation</h2>
+                <button class="btn-close" onclick="closeCancelModal()">
+                    <i class="fa-solid fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to cancel this reservation?</p>
+                <textarea id="cancelReason" placeholder="Reason for cancellation (optional)" rows="3"></textarea>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-cancel-confirm" onclick="confirmCancel()">Yes, Cancel</button>
+                <button class="btn-cancel-back" onclick="closeCancelModal()">Go Back</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="reservations-list.js"></script>
+</body>
+</html>

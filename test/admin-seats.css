@@ -244,17 +244,6 @@ h3 { margin: 10px 0 5px; font-size: 1.4rem; color: #333; }
     margin-bottom: 10px;
 }
 
-.btn-action {
-    background-color: var(--primary-brown);
-    color: white;
-    border: none;
-    padding: 10px 30px;
-    border-radius: 20px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background 0.2s;
-    width: 100%;
-}
 .btn-action:hover { background-color: #5d3a00; }
 .btn-action:disabled { opacity: 0.5; cursor: not-allowed; background-color: #999; }
 
@@ -277,9 +266,3 @@ h3 { margin: 10px 0 5px; font-size: 1.4rem; color: #333; }
 .dot.red { background-color: var(--seat-red); }
 .dot.brown { background-color: var(--seat-brown); }
 .dot.gray { background-color: var(--seat-gray); }
-
-@media (max-width: 900px) {
-    .seats-container { flex-direction: column; align-items: center; }
-    .navbar { padding: 0 20px; }
-    .navbar nav ul { display: none; }
-}

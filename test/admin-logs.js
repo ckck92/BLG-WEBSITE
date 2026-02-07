@@ -1,12 +1,17 @@
 import { supabase } from './supabaseclient.js';
 
 let currentUser = null;
+let currentPage = 1;
+let totalPages = 1;
+const itemsPerPage = 5;
+let allLogs = [];
+let filteredLogs = [];
 
 document.addEventListener('DOMContentLoaded', async () => {
     await initAuth();
     setupDropdown();
     setupSignOut();
-    loadLogs();
+    await loadLogs();
 });
 
 async function initAuth() {
@@ -32,53 +37,103 @@ async function initAuth() {
     document.getElementById('userName').textContent = `Hi, ${currentUser.first_name}`;
 }
 
-window.loadLogs = async function() {
+async function loadLogs() {
+    try {
+        const { data: logs, error } = await supabase
+            .from('tbl_admin_logs')
+            .select(`
+                *,
+                tbl_users (first_name, last_name, role)
+            `)
+            .order('created_at', { ascending: false });
+
+        if (error) {
+            console.error('Error loading logs:', error);
+            document.getElementById('logsContainer').innerHTML = 
+                '<p style="text-align: center; padding: 40px; color: #ef4444;">Error loading logs: ' + error.message + '</p>';
+            return;
+        }
+
+        allLogs = logs || [];
+        filteredLogs = [...allLogs];
+        currentPage = 1;
+        updatePagination();
+        displayCurrentPage();
+        
+    } catch (error) {
+        console.error('Load logs exception:', error);
+        document.getElementById('logsContainer').innerHTML = 
+            '<p style="text-align: center; padding: 40px; color: #ef4444;">Failed to load logs</p>';
+    }
+}
+
+window.applyFilters = function() {
     const actionFilter = document.getElementById('actionFilter').value;
     const dateFilter = document.getElementById('dateFilter').value;
 
-    let query = supabase
-        .from('tbl_admin_logs')
-        .select(`
-            *,
-            tbl_users (first_name, last_name, role)
-        `)
-        .order('created_at', { ascending: false })
-        .limit(50);
-
-    if (actionFilter) {
-        query = query.eq('action', actionFilter);
-    }
-
-    if (dateFilter) {
-        const startOfDay = new Date(dateFilter);
-        startOfDay.setHours(0, 0, 0, 0);
-        const endOfDay = new Date(dateFilter);
-        endOfDay.setHours(23, 59, 59, 999);
+    filteredLogs = allLogs.filter(log => {
+        if (actionFilter && log.action !== actionFilter) return false;
         
-        query = query
-            .gte('created_at', startOfDay.toISOString())
-            .lte('created_at', endOfDay.toISOString());
-    }
+        if (dateFilter) {
+            const logDate = new Date(log.created_at).toISOString().split('T')[0];
+            if (logDate !== dateFilter) return false;
+        }
+        
+        return true;
+    });
 
-    const { data: logs, error } = await query;
-
-    if (error) {
-        console.error('Error loading logs:', error);
-        return;
-    }
-
-    displayLogs(logs);
+    currentPage = 1;
+    updatePagination();
+    displayCurrentPage();
 };
 
-function displayLogs(logs) {
+window.resetFilters = function() {
+    document.getElementById('actionFilter').value = '';
+    document.getElementById('dateFilter').value = '';
+    
+    filteredLogs = [...allLogs];
+    currentPage = 1;
+    updatePagination();
+    displayCurrentPage();
+};
+
+function updatePagination() {
+    totalPages = Math.ceil(filteredLogs.length / itemsPerPage) || 1;
+    document.getElementById('pageInfo').textContent = `Page ${currentPage} / ${totalPages}`;
+}
+
+window.changePage = function(direction) {
+    switch(direction) {
+        case 'first':
+            currentPage = 1;
+            break;
+        case 'prev':
+            if (currentPage > 1) currentPage--;
+            break;
+        case 'next':
+            if (currentPage < totalPages) currentPage++;
+            break;
+        case 'last':
+            currentPage = totalPages;
+            break;
+    }
+    displayCurrentPage();
+    updatePagination();
+};
+
+function displayCurrentPage() {
+    const start = (currentPage - 1) * itemsPerPage;
+    const end = start + itemsPerPage;
+    const pageData = filteredLogs.slice(start, end);
+    
     const container = document.getElementById('logsContainer');
     
-    if (!logs || logs.length === 0) {
+    if (pageData.length === 0) {
         container.innerHTML = '<p style="text-align: center; padding: 40px; color: #999;">No logs found</p>';
         return;
     }
 
-    container.innerHTML = logs.map(log => {
+    container.innerHTML = pageData.map(log => {
         const actorName = log.tbl_users 
             ? `${log.tbl_users.first_name} ${log.tbl_users.last_name} (${log.tbl_users.role})`
             : 'System';
@@ -102,7 +157,7 @@ function displayLogs(logs) {
                         <div class="log-icon ${iconClass}">
                             <i class="fa-solid fa-${icon}"></i>
                         </div>
-                        ${actionText}
+                        <span>${actionText}</span>
                     </div>
                     <div class="log-time">${timeStr}</div>
                 </div>
@@ -123,9 +178,9 @@ function formatLogEntry(log) {
                 iconClass: 'icon-create',
                 actionText: 'Reservation Created',
                 detailsHtml: `
-                    <span class="detail-badge">Recipient: ${details.service_recipient}</span>
-                    <span class="detail-badge">Seat: ${details.seat_id}</span>
-                    <span class="detail-badge">Total: ₱${details.total_price}</span>
+                    <span class="detail-badge">Recipient: ${details.service_recipient || 'N/A'}</span>
+                    <span class="detail-badge">Seat: ${details.seat_id || 'N/A'}</span>
+                    <span class="detail-badge">Total: ₱${details.total_price || '0'}</span>
                 `
             };
             
@@ -135,21 +190,21 @@ function formatLogEntry(log) {
                 accepted: '#4caf50',
                 on_hold: '#2196f3',
                 ongoing: '#ff9800',
-                completed: '#9e9e9e'
+                completed: '#9e9e9e',
+                cancelled: '#ef4444'
             };
             return {
                 icon: 'arrows-rotate',
                 iconClass: 'icon-update',
                 actionText: 'Reservation Status Updated',
                 detailsHtml: `
-                    <span class="detail-badge">Recipient: ${details.service_recipient}</span>
-                    <span class="detail-badge" style="background: ${statusColors[details.old_status]}; color: white;">
-                        Old: ${details.old_status}
+                    <span class="detail-badge">Recipient: ${details.service_recipient || 'N/A'}</span>
+                    <span class="detail-badge" style="background: ${statusColors[details.old_status] || '#999'}; color: white;">
+                        Old: ${details.old_status || 'N/A'}
                     </span>
-                    <span class="detail-badge" style="background: ${statusColors[details.new_status]}; color: white;">
-                        New: ${details.new_status}
+                    <span class="detail-badge" style="background: ${statusColors[details.new_status] || '#999'}; color: white;">
+                        New: ${details.new_status || 'N/A'}
                     </span>
-                    <span class="detail-badge">Seat: ${details.seat_id}</span>
                 `
             };
             
@@ -159,8 +214,8 @@ function formatLogEntry(log) {
                 iconClass: 'icon-create',
                 actionText: 'New Barber Account Created',
                 detailsHtml: `
-                    <span class="detail-badge">Barber ID: ${details.barber_id}</span>
-                    <span class="detail-badge">Experience: ${details.years_of_experience} years</span>
+                    <span class="detail-badge">Barber ID: ${details.barber_id || 'N/A'}</span>
+                    <span class="detail-badge">Experience: ${details.years_of_experience || 'N/A'} years</span>
                 `
             };
             
@@ -170,9 +225,8 @@ function formatLogEntry(log) {
                 iconClass: 'icon-create',
                 actionText: 'Announcement Posted',
                 detailsHtml: `
-                    <span class="detail-badge">Title: ${details.title}</span>
-                    <span class="detail-badge">Audience: ${details.audience}</span>
-                    <span class="detail-badge">${details.is_active ? 'Active' : 'Inactive'}</span>
+                    <span class="detail-badge">Title: ${details.title || 'N/A'}</span>
+                    <span class="detail-badge">Audience: ${details.audience || 'N/A'}</span>
                 `
             };
             
@@ -181,16 +235,10 @@ function formatLogEntry(log) {
                 icon: 'circle-info',
                 iconClass: 'icon-update',
                 actionText: log.action.replace(/_/g, ' ').toUpperCase(),
-                detailsHtml: `<pre>${JSON.stringify(details, null, 2)}</pre>`
+                detailsHtml: `<span class="detail-badge">Action performed</span>`
             };
     }
 }
-
-window.resetFilters = function() {
-    document.getElementById('actionFilter').value = '';
-    document.getElementById('dateFilter').value = '';
-    loadLogs();
-};
 
 function setupDropdown() {
     const userIcon = document.getElementById('userIcon');

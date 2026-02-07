@@ -1,0 +1,265 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+}
+
+:root {
+    --primary-brown: #4a2c0a;
+    --brown-light: #8b6f47;
+    --bg-cream: #faf8f3;
+    --text-dark: #2c1810;
+    --success: #10b981;
+    --error: #ef4444;
+}
+
+body {
+    background: linear-gradient(135deg, var(--bg-cream) 0%, #e8dcc8 100%);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.container {
+    width: 100%;
+    max-width: 600px;
+}
+
+.checkin-card {
+    background: white;
+    border-radius: 20px;
+    padding: 50px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+    text-align: center;
+}
+
+.header {
+    margin-bottom: 40px;
+}
+
+.header i {
+    font-size: 4rem;
+    color: var(--primary-brown);
+    margin-bottom: 20px;
+}
+
+.header h1 {
+    font-size: 2.5rem;
+    color: var(--text-dark);
+    margin-bottom: 10px;
+    font-weight: 800;
+}
+
+.header p {
+    font-size: 1.1rem;
+    color: #666;
+}
+
+.input-section {
+    margin-bottom: 30px;
+}
+
+.input-section label {
+    display: block;
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--text-dark);
+    margin-bottom: 15px;
+    text-align: left;
+}
+
+.input-section label i {
+    color: var(--primary-brown);
+    margin-right: 10px;
+}
+
+#barberUid {
+    width: 100%;
+    padding: 25px;
+    font-size: 3rem;
+    font-weight: 700;
+    text-align: center;
+    border: 3px solid var(--primary-brown);
+    border-radius: 15px;
+    font-family: 'Courier New', monospace;
+    letter-spacing: 8px;
+    transition: all 0.3s;
+}
+
+#barberUid:focus {
+    outline: none;
+    border-color: var(--brown-light);
+    box-shadow: 0 0 0 5px rgba(74, 44, 10, 0.1);
+    transform: scale(1.02);
+}
+
+#barberUid::placeholder {
+    color: #ccc;
+    letter-spacing: 8px;
+}
+
+.hint {
+    display: block;
+    margin-top: 10px;
+    color: #999;
+    font-size: 0.9rem;
+    font-style: italic;
+}
+
+.btn-checkin {
+    width: 100%;
+    padding: 20px;
+    font-size: 1.5rem;
+    font-weight: 700;
+    background: var(--primary-brown);
+    color: white;
+    border: none;
+    border-radius: 15px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    transition: all 0.3s;
+    margin-bottom: 20px;
+}
+
+.btn-checkin:hover {
+    background: var(--brown-light);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 20px rgba(74, 44, 10, 0.3);
+}
+
+.btn-checkin:active {
+    transform: translateY(0);
+}
+
+.btn-checkin:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.message {
+    padding: 15px;
+    border-radius: 10px;
+    font-weight: 600;
+    margin-bottom: 20px;
+    display: none;
+}
+
+.message.success {
+    background: #d1fae5;
+    color: #065f46;
+    border: 2px solid var(--success);
+    display: block;
+}
+
+.message.error {
+    background: #fee2e2;
+    color: #991b1b;
+    border: 2px solid var(--error);
+    display: block;
+}
+
+.message i {
+    margin-right: 10px;
+}
+
+.info-box {
+    background: var(--bg-cream);
+    padding: 20px;
+    border-radius: 10px;
+    display: flex;
+    gap: 15px;
+    text-align: left;
+    border: 2px dashed var(--brown-light);
+}
+
+.info-box i {
+    font-size: 1.5rem;
+    color: var(--primary-brown);
+    flex-shrink: 0;
+}
+
+.info-box strong {
+    color: var(--primary-brown);
+}
+
+.recent-checkins {
+    margin-top: 30px;
+    padding-top: 30px;
+    border-top: 2px solid #eee;
+}
+
+.recent-checkins h3 {
+    color: var(--text-dark);
+    margin-bottom: 15px;
+    font-size: 1.3rem;
+}
+
+#checkinList {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.checkin-item {
+    background: var(--bg-cream);
+    padding: 12px 15px;
+    border-radius: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.checkin-item .name {
+    font-weight: 600;
+    color: var(--text-dark);
+}
+
+.checkin-item .time {
+    color: #666;
+    font-size: 0.9rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .checkin-card {
+        padding: 30px 20px;
+    }
+
+    .header h1 {
+        font-size: 2rem;
+    }
+
+    #barberUid {
+        font-size: 2.5rem;
+        padding: 20px;
+        letter-spacing: 5px;
+    }
+
+    .btn-checkin {
+        font-size: 1.2rem;
+        padding: 18px;
+    }
+}
+
+/* Animation */
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.checkin-card {
+    animation: slideIn 0.5s ease-out;
+}

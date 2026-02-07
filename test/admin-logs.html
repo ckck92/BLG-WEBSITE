@@ -7,17 +7,17 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="admin-logs.css">
-    <link rel="icon" type="image/png" href="blgcircle.png">
+    <link rel="icon" type="image/png" href="blgletter.png">
 </head>
 <body>
 
     <header class="navbar">
-        <a href="dashboard.html" class="logo">
+        <a href="admin-dashboard.html" class="logo">
             <img src="blgletterwhite.png" alt="BLG" class="logo-img"> BOSS LUPIT GUPIT
         </a>
         <nav>
             <ul>
-                <li><a href="dashboard.html">Home</a></li>
+                <li><a href="admin-dashboard.html">Home</a></li>
                 <li><a href="admin-service-history.html">Barbers Service History</a></li>
                 <li><a href="#" class="active">Logs</a></li>
             </ul>
@@ -37,7 +37,7 @@
 
     <main class="container">
         <div class="page-header">
-            <button class="back-btn" onclick="window.location.href='dashboard.html'">
+            <button class="back-btn" onclick="window.location.href='admin-dashboard.html'">
                 <i class="fa-solid fa-arrow-left"></i>
             </button>
             <h1>System Activity Logs</h1>
@@ -54,8 +54,8 @@
             
             <input type="date" id="dateFilter" class="filter-input" placeholder="Filter by date">
             
-            <button class="btn-filter" onclick="loadLogs()">
-                <i class="fa-solid fa-filter"></i> Apply Filters
+            <button class="btn-filter" onclick="applyFilters()">
+                <i class="fa-solid fa-filter"></i> Apply
             </button>
             
             <button class="btn-reset" onclick="resetFilters()">
@@ -68,11 +68,11 @@
         </div>
 
         <div class="pagination">
-            <button class="page-btn"><i class="fa-solid fa-angles-left"></i></button>
-            <button class="page-btn"><i class="fa-solid fa-chevron-left"></i></button>
-            <span class="page-info">Page 1 / 30</span>
-            <button class="page-btn"><i class="fa-solid fa-chevron-right"></i></button>
-            <button class="page-btn"><i class="fa-solid fa-angles-right"></i></button>
+            <button class="page-btn" onclick="changePage('first')"><i class="fa-solid fa-angles-left"></i></button>
+            <button class="page-btn" onclick="changePage('prev')"><i class="fa-solid fa-chevron-left"></i></button>
+            <span class="page-info" id="pageInfo">Page 1 / 1</span>
+            <button class="page-btn" onclick="changePage('next')"><i class="fa-solid fa-chevron-right"></i></button>
+            <button class="page-btn" onclick="changePage('last')"><i class="fa-solid fa-angles-right"></i></button>
         </div>
     </main>
 
