@@ -70,7 +70,9 @@ body {
     letter-spacing: 0.5px;
 }
 
-.navbar nav ul li a:hover { opacity: 0.8; }
+.navbar nav ul li a:hover { 
+    opacity: 0.8; 
+}
 
 .user-profile {
     display: flex;
@@ -83,8 +85,14 @@ body {
     z-index: 2;
 }
 
-.user-profile i { color: white; transition: transform 0.2s; }
-.user-profile:hover i { transform: scale(1.1); }
+.user-profile i { 
+    color: white; 
+    transition: transform 0.2s; 
+}
+
+.user-profile:hover i { 
+    transform: scale(1.1); 
+}
 
 .dropdown-menu {
     display: none;
@@ -100,7 +108,11 @@ body {
     margin-top: 10px;
     border: 1px solid #eee;
 }
-.dropdown-menu.show { display: block; }
+
+.dropdown-menu.show { 
+    display: block; 
+}
+
 .dropdown-item {
     display: flex;
     align-items: center;
@@ -110,7 +122,10 @@ body {
     text-decoration: none;
     font-weight: 600;
 }
-.dropdown-item:hover { background-color: #f5ead6; }
+
+.dropdown-item:hover { 
+    background-color: #f5ead6; 
+}
 
 .container {
     max-width: 1600px;
@@ -209,7 +224,7 @@ th, td {
 }
 
 th {
-    background-color: var(--brown-dark);
+    background-color: var(--brown-dark); /* #5d3a1a */
     color: white;
     font-weight: 700;
     text-transform: uppercase;
@@ -217,7 +232,11 @@ th {
 }
 
 tbody tr:hover {
-    background-color: #faf8f3;
+    background-color: #faf8f3; /* Cream hover */
+}
+
+tbody tr:last-child td {
+    border-bottom: none;
 }
 
 .status-dropdown {
@@ -272,7 +291,7 @@ tbody tr:hover {
 
 .page-btn {
     background: white;
-    border: 1px solid var(--border-color);
+    border: 1px solid var(--border-color); /* #d4c5b0 */
     width: 32px;
     height: 32px;
     border-radius: 4px;
@@ -280,6 +299,16 @@ tbody tr:hover {
     display: flex;
     align-items: center;
     justify-content: center;
+    transition: background 0.2s;
+}
+
+.page-btn:hover:not(:disabled) {
+    background: var(--bg-cream); /* #faf8f3 */
+}
+
+.page-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
 }
 
 .page-info {
@@ -387,4 +416,71 @@ tbody tr:hover {
     display: flex;
     align-items: center;
     gap: 8px;
+}
+
+/* admin-cancelled-reservations css filter */
+style>
+.filters-section {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    align-items: flex-end;
+}
+
+.filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    min-width: 250px;
+}
+
+.filter-group label {
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: var(--text-dark);
+}
+
+.filter-group label i {
+    margin-right: 5px;
+    color: var(--brown-dark);
+}
+
+.filter-input {
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    font-family: inherit;
+    transition: border-color 0.2s;
+}
+
+.filter-input:focus {
+    outline: none;
+    border-color: var(--brown-dark);
+}
+
+.filter-actions {
+    display: flex;
+    align-items: flex-end;
+    margin-left: auto;
+}
+
+.reset-btn {
+    padding: 8px 16px;
+    background: var(--brown-dark);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: background 0.2s;
+}
+
+.reset-btn:hover {
+    background: var(--brown-light);
 }

@@ -5,6 +5,7 @@ let countdownIntervals = []; // Store interval IDs for cleanup
 
 document.addEventListener('DOMContentLoaded', async () => {
     await initAuth();
+    await loadRevenueData();
     setupDropdown();
     setupSignOut();
     loadDashboardData();
@@ -77,43 +78,202 @@ async function loadStatistics() {
 }
 
 async function loadRecentReservations() {
-    // Clear existing countdown intervals
-    countdownIntervals.forEach(interval => clearInterval(interval));
-    countdownIntervals = [];
+    try {
+        const { data: reservations, error } = await supabase
+            .from('tbl_reservations')
+            .select(`
+                id,
+                service_recipient,
+                reserved_datetime,
+                status,
+                total_price,
+                tbl_users!tbl_reservations_user_id_fkey (
+                    first_name,
+                    last_name
+                ),
+                tbl_barbers!tbl_reservations_barber_id_fkey (
+                    user_id,
+                    tbl_users (first_name, last_name)
+                ),
+                tbl_reservation_services (
+                    is_base_service,
+                    tbl_services (name)
+                )
+            `)
+            .in('status', ['pending', 'accepted', 'on_hold'])
+            .order('created_at', { ascending: false })
+            .limit(1); // ← SHOW ONLY 1 MOST RECENT
 
-    const { data: reservations, error } = await supabase
-        .from('tbl_reservations')
-        .select(`
-            id,
-            service_recipient,
-            user_id,
-            seat_id,
-            barber_id,
-            reserved_date,
-            reserved_time,
-            reserved_datetime,
-            status,
-            total_price,
-            tbl_users!tbl_reservations_user_id_fkey (first_name, last_name),
-            tbl_barbers!tbl_reservations_barber_id_fkey (
-                user_id,
-                tbl_users (first_name, last_name)
-            ),
-            tbl_reservation_services (
-                is_base_service,
-                tbl_services (name)
-            )
-        `)
-        .in('status', ['pending', 'accepted', 'on_hold', 'ongoing'])
-        .order('created_at', { ascending: false })
-        .limit(3);
+        if (error) throw error;
 
-    if (error) {
-        console.error('Error loading reservations:', error);
-        return;
+        const container = document.getElementById('recentReservations');
+        if (!container) return;
+
+        if (!reservations || reservations.length === 0) {
+            container.innerHTML = `
+                <div class="empty-state">
+                    <i class="fa-solid fa-calendar-xmark" style="font-size: 2rem; color: #ddd; margin-bottom: 10px;"></i>
+                    <p>No client has made a reservation yet</p>
+                </div>
+            `;
+            return;
+        }
+
+        // Display the single most recent reservation
+        const reservation = reservations[0];
+        
+        const clientName = reservation.tbl_users
+            ? `${reservation.tbl_users.first_name} ${reservation.tbl_users.last_name}`
+            : 'Unknown';
+
+        const barberName = reservation.tbl_barbers?.tbl_users
+            ? `${reservation.tbl_barbers.tbl_users.first_name} ${reservation.tbl_barbers.tbl_users.last_name}`
+            : 'Unassigned';
+
+        const baseService = reservation.tbl_reservation_services?.find(s => s.is_base_service);
+        const addons = reservation.tbl_reservation_services?.filter(s => !s.is_base_service) || [];
+        
+        let serviceDetails = baseService?.tbl_services?.name || 'Service';
+        if (addons.length > 0) {
+            serviceDetails += ' + ' + addons.map(a => a.tbl_services.name).join(', ');
+        }
+
+        const dateTime = new Date(reservation.reserved_datetime);
+        const dateStr = dateTime.toLocaleDateString('en-US', {
+            month: 'short',
+            day: 'numeric',
+            year: 'numeric'
+        });
+        const timeStr = dateTime.toLocaleTimeString('en-US', {
+            hour: 'numeric',
+            minute: '2-digit',
+            hour12: true
+        });
+
+        // Status badge
+        let statusClass = '';
+        let statusText = '';
+        switch(reservation.status) {
+            case 'pending':
+                statusClass = 'status-pending';
+                statusText = 'Pending';
+                break;
+            case 'accepted':
+                statusClass = 'status-accepted';
+                statusText = 'Accepted';
+                break;
+            case 'on_hold':
+                statusClass = 'status-on-hold';
+                statusText = 'On Hold';
+                break;
+        }
+
+        container.innerHTML = `
+            <div class="reservation-item">
+                <div class="reservation-header">
+                    <h3>${reservation.service_recipient}</h3>
+                    <span class="status-badge ${statusClass}">${statusText}</span>
+                </div>
+                <div class="reservation-details">
+                    <div>
+                        <i class="fa-solid fa-user"></i>
+                        <span>Reserved by: ${clientName}</span>
+                    </div>
+                    <div>
+                        <i class="fa-solid fa-scissors"></i>
+                        <span>Barber: ${barberName}</span>
+                    </div>
+                    <div>
+                        <i class="fa-solid fa-calendar"></i>
+                        <span>${dateStr} at ${timeStr}</span>
+                    </div>
+                    <div>
+                        <i class="fa-solid fa-cut"></i>
+                        <span>${serviceDetails}</span>
+                    </div>
+                    <div>
+                        <i class="fa-solid fa-peso-sign"></i>
+                        <span>₱${reservation.total_price}</span>
+                    </div>
+                </div>
+            </div>
+        `;
+
+    } catch (error) {
+        console.error('Error loading recent reservations:', error);
+        const container = document.getElementById('recentReservations');
+        if (container) {
+            container.innerHTML = `
+                <div class="empty-state">
+                    <p style="color: #ef4444;">Error loading reservations</p>
+                </div>
+            `;
+        }
     }
+}
+    
 
-    displayRecentReservations(reservations);
+async function loadRevenueData() {
+    try {
+        const { data: completedServices, error } = await supabase
+            .from('tbl_reservations')
+            .select('total_price, completed_at')
+            .eq('status', 'completed');
+
+        if (error) throw error;
+
+        const allServices = completedServices || [];
+        
+        // Setup filter change listener
+        const periodFilter = document.getElementById('revenuePeriod');
+        if (periodFilter) {
+            periodFilter.addEventListener('change', (e) => {
+                updateRevenue(allServices, e.target.value);
+            });
+        }
+
+        // Initial load - show today's revenue
+        updateRevenue(allServices, 'today');
+
+    } catch (error) {
+        console.error('Error loading revenue:', error);
+        document.getElementById('totalRevenue').textContent = '₱0';
+    }
+}
+
+function updateRevenue(services, period) {
+    const now = new Date();
+    let filteredServices = [];
+    
+    switch(period) {
+        case 'today':
+            const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+            filteredServices = services.filter(s => 
+                new Date(s.completed_at) >= todayStart
+            );
+            break;
+            
+        case 'weekly':
+            const weekStart = new Date(now);
+            weekStart.setDate(now.getDate() - now.getDay());
+            weekStart.setHours(0, 0, 0, 0);
+            filteredServices = services.filter(s => 
+                new Date(s.completed_at) >= weekStart
+            );
+            break;
+            
+        case 'monthly':
+            const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+            filteredServices = services.filter(s => 
+                new Date(s.completed_at) >= monthStart
+            );
+            break;
+    }
+    
+    const totalRevenue = filteredServices.reduce((sum, s) => sum + s.total_price, 0);
+    
+    document.getElementById('totalRevenue').textContent = `₱${totalRevenue.toLocaleString()}`;
+    document.getElementById('revenueCount').textContent = `${filteredServices.length} completed service${filteredServices.length !== 1 ? 's' : ''}`;
 }
 
 function displayRecentReservations(reservations) {

@@ -322,3 +322,76 @@ body {
     transition: all 0.3s;
     box-shadow: 0 2px 8px rgba(74, 44, 10, 0.2);
 }
+
+.revenue-card {
+    position: relative;
+    padding-bottom: 50px; /* Reduced from 60px */
+}
+
+.revenue-content {
+    flex: 1;
+}
+
+.revenue-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.revenue-header h3 {
+    font-size: 0.8rem;
+    color: #666;
+    margin: 0;
+}
+
+.revenue-filter {
+    padding: 3px 6px; /* Smaller dropdown */
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 0.7rem; /* Smaller text */
+    font-family: inherit;
+    cursor: pointer;
+    background: white;
+}
+
+.revenue-amount {
+    font-size: 1.6rem; /* Reduced from 2rem */
+    font-weight: 700;
+    color: var(--text-dark);
+    margin: 3px 0;
+}
+
+.revenue-count {
+    font-size: 0.7rem; /* Smaller */
+    color: #999;
+    margin-top: 3px;
+}
+
+.view-details {
+    position: absolute;
+    bottom: 12px;
+    left: 18px;
+    right: 18px;
+    padding: 6px; /* Reduced from 8px */
+    background: var(--brown-dark);
+    color: white;
+    text-decoration: none;
+    border-radius: 6px;
+    text-align: center;
+    font-size: 0.75rem; /* Smaller text */
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    transition: background 0.2s;
+}
+
+.view-details:hover {
+    background: var(--brown-light);
+}
+
+.view-details i {
+    font-size: 0.9rem;
+}

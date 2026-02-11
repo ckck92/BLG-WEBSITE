@@ -123,23 +123,25 @@
                 </div>
             </div>
 
-            <div class="stat-card revenue">
+            <div class="stat-card revenue-card">
                 <i class="fa-solid fa-peso-sign"></i>
-                <div class="stat-info">
-                    <div class="stat-value" id="statRevenue">₱0</div>
-                    <div class="stat-label">Reservation Total Revenue</div>
+                <div class="revenue-content">
+                    <div class="revenue-header">
+                        <h3>Total Reservation Revenue</h3>
+                        <select id="revenuePeriod" class="revenue-filter">
+                            <option value="today">Today</option>
+                            <option value="weekly">This Week</option>
+                            <option value="monthly">This Month</option>
+                        </select>
+                    </div>
+                    <p id="totalRevenue" class="revenue-amount">₱0</p>
+                    <p id="revenueCount" class="revenue-count">0 completed services</p>
                 </div>
+                <a href="admin-total-revenue.html" class="view-details">
+                    View Details <i class="fa-solid fa-arrow-right"></i>
+                </a>
             </div>
-        </div>
 
-        <!-- Recent Reservations Below Stats -->
-        <div class="section-box reservations-box">
-            <h2>Recent Reservation</h2>
-            <div class="reservations-content" id="recentReservations">
-                <p class="empty-state">No client has made a reservation yet</p>
-            </div>
-        </div>
-    </main>
 
     <script type="module" src="admin-dashboard.js"></script>
 </body>

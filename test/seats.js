@@ -54,7 +54,6 @@ function renderLegend() {
         legend.innerHTML = `
             <div class="legend-item"><div class="dot green"></div> Available</div>
             <div class="legend-item"><div class="dot blue"></div> Your Reservation</div>
-            <div class="legend-item"><div class="dot brown"></div> Upcoming (&lt;30 min)</div>
             <div class="legend-item"><div class="dot red"></div> Service Ongoing</div>
             <div class="legend-item"><div class="dot gray"></div> Shop Closed</div>
         `;
@@ -185,7 +184,6 @@ function renderSeatCard(seat, allReservations, isShopOpen, now) {
                             month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit', hour12: true 
                         });
                         icon = '<i class="fa-solid fa-user-check"></i>';
-                        buttonHtml = '<button class="btn-action btn-secondary" onclick="window.location.href=\'reservations.html\'">View Details</button>';
                         
                         if (diffMinutes <= 5 && diffMinutes > 0) {
                             warningHtml = '<p class="desc warning"><small>Grace period active. If missed, seat will open for walk-ins.</small></p>';

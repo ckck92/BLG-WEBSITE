@@ -72,7 +72,6 @@ function displayUserProfile(user) {
                 <span class="label">Contact Number</span>
                 <span class="value">${user.contact_number || 'N/A'}</span>
             </div>
-        
         `;
     }
 

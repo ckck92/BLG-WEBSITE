@@ -3,17 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Create Announcement - Boss Lupit Gupit</title>
+    <title>Announcements - Boss Lupit Gupit</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="admin-announcements.css">
-    <link rel="icon" type="image/png" href="blgcircle.png">
+    <link rel="icon" type="image/png" href="blgletterwhite.png">
 </head>
 <body>
-
     <header class="navbar">
         <a href="admin-dashboard.html" class="logo">
-            <img src="blgcircle.png" alt="BLG" class="logo-img"> BOSS LUPIT GUPIT
+            <img src="blgletterwhite.png" alt="BLG" class="logo-img">
+            BOSS LUPIT GUPIT
         </a>
         <nav>
             <ul>
@@ -24,10 +24,13 @@
         </nav>
         
         <div class="user-profile" id="userProfileContainer">
-            <span id="userName">Hi, user123</span>
+            <span id="userName">Hi, Admin</span>
             <i class="fa-solid fa-circle-user fa-2xl" id="userIcon"></i>
             
             <div class="dropdown-menu" id="userDropdown">
+                <a href="admin-profile.html" class="dropdown-item">
+                    <i class="fa-solid fa-id-card"></i> View Profile
+                </a>
                 <a href="#" class="dropdown-item" id="signOutLink">
                     <i class="fa-solid fa-right-from-bracket"></i> Sign Out
                 </a>
@@ -35,38 +38,78 @@
         </div>
     </header>
 
+    <!-- MAIN CONTENT -->
     <main class="container">
+        <!-- Page Header -->
         <div class="page-header">
-            <button class="back-btn" onclick="window.location.href='admin-dashboard.html'">
+            <button class="back-btn" onclick="window.history.back()">
                 <i class="fa-solid fa-arrow-left"></i>
             </button>
             <h1>Create Announcement</h1>
         </div>
 
-        <div class="announcement-section">
-            <h2>Announcement for Clients</h2>
-            <p class="section-desc">Create announcements that will be visible to all clients</p>
-            
-            <div class="form-group">
-                <label for="announcementTitle">Title</label>
-                <input type="text" id="announcementTitle" placeholder="Enter announcement title" maxlength="100">
-            </div>
-            
-            <div class="form-group">
-                <label for="announcementMessage">Message</label>
-                <textarea id="announcementMessage" placeholder="Enter announcement message..." rows="5"></textarea>
-            </div>
-            
-            <button class="btn-announce" onclick="createAnnouncement()">
-                <i class="fa-solid fa-bullhorn"></i> Post Announcement
-            </button>
+        <!-- Create Announcement Form (Compact) -->
+        <div class="form-card">
+    <h3>Announcement for Clients</h3>
+    <p class="form-subtitle">Create announcements that will be visible to all clients</p>
+    
+    <form id="announcementForm">
+        <div class="form-group">
+            <label for="announcementMessage">Message *</label>
+            <textarea 
+                id="announcementMessage" 
+                placeholder="Enter announcement message (10-500 characters)..."
+                rows="4"
+                required
+                maxlength="500"></textarea>
+            <small style="color: #666;">Min 10 characters, max 500 characters</small>
         </div>
 
-        <!-- Recent Announcements -->
-        <div class="recent-section">
+        <button type="submit" class="btn-post">
+            <i class="fa-solid fa-bullhorn"></i>
+            Post Announcement
+        </button>
+    </form>
+</div>
+
+        <!-- Announcements List (Table with Pagination) -->
+        <div class="announcements-section">
             <h2>Recent Announcements</h2>
-            <div id="recentAnnouncementsList">
-                <p style="text-align: center; padding: 20px; color: #999;">Loading...</p>
+            
+            <div class="table-wrapper">
+                <table id="announcementsTable">
+                    <thead>
+                        <tr>
+                            <th>TITLE</th>
+                            <th>MESSAGE</th>
+                            <th>POSTED ON</th>
+                        </tr>
+                    </thead>
+                    <tbody id="announcementsTableBody">
+                        <tr>
+                            <td colspan="5" style="text-align: center; padding: 40px;">
+                                <i class="fa-solid fa-spinner fa-spin"></i> Loading...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination -->
+            <div class="pagination">
+                <button class="page-btn" onclick="changePage('first')">
+                    <i class="fa-solid fa-angles-left"></i>
+                </button>
+                <button class="page-btn" onclick="changePage('prev')">
+                    <i class="fa-solid fa-chevron-left"></i>
+                </button>
+                <span class="page-info" id="pageInfo">Page 1 / 1</span>
+                <button class="page-btn" onclick="changePage('next')">
+                    <i class="fa-solid fa-chevron-right"></i>
+                </button>
+                <button class="page-btn" onclick="changePage('last')">
+                    <i class="fa-solid fa-angles-right"></i>
+                </button>
             </div>
         </div>
     </main>

@@ -208,7 +208,7 @@ function displayCurrentPage() {
                             data-current-status="${res.status}"
                             ${res.is_rescheduled && res.status === 'accepted' ? 'disabled' : ''}>
                             <option value="pending" ${res.status === 'pending' ? 'selected' : ''}>Pending</option>
-                            <option value="accepted" ${res.status === 'accepted' ? 'selected' : ''}>${statusLabel}</option>
+                            <option value="accepted" ${res.status === 'accepted' ? 'selected' : ''}>Accepted</option>
                             <option value="on_hold" ${res.status === 'on_hold' ? 'selected' : ''}>On Hold</option>
                             <option value="ongoing" ${res.status === 'ongoing' ? 'selected' : ''}>Ongoing</option>
                             <option value="completed" ${res.status === 'completed' ? 'selected' : ''}>Complete</option>

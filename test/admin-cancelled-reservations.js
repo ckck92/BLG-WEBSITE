@@ -1,16 +1,22 @@
 import { supabase } from './supabaseclient.js';
 
 let currentUser = null;
+let allReservations = [];
+let filteredReservations = [];
 let currentPage = 1;
-let totalPages = 1;
 const itemsPerPage = 5;
-let allCancelled = [];
 
 document.addEventListener('DOMContentLoaded', async () => {
     await initAuth();
+    await loadCancelledReservations();
+    await autoCancelPassedRescheduled();
+
     setupDropdown();
     setupSignOut();
-    await loadCancelledReservations();
+    setupFilters(); // setup filters AFTER loading data
+
+    // runs auto-cancel every 5 mins
+    setInterval(autoCancelPassedRescheduled, 5 * 60 * 1000);
 });
 
 async function initAuth() {
@@ -52,6 +58,7 @@ async function loadCancelledReservations() {
             total_price,
             cancellation_reason,
             cancelled_by,
+            cancelled_at,
             tbl_users!tbl_reservations_user_id_fkey (first_name, last_name),
             tbl_barbers!tbl_reservations_barber_id_fkey (
                 user_id,
@@ -63,6 +70,7 @@ async function loadCancelledReservations() {
             )
         `)
         .eq('status', 'cancelled')
+        .order('cancelled_at', { ascending: false, nullsFirst: false })
         .order('updated_at', { ascending: false });
 
     if (error) {
@@ -70,46 +78,137 @@ async function loadCancelledReservations() {
         return;
     }
 
-    allCancelled = reservations || [];
-    updatePagination();
+    allReservations = reservations || [];
+    filteredReservations = [...allReservations]; // Initialize filtered data
     displayCurrentPage();
 }
 
-function updatePagination() {
-    totalPages = Math.ceil(allCancelled.length / itemsPerPage) || 1;
-    document.getElementById('pageInfo').textContent = `Page ${currentPage} / ${totalPages}`;
-}
+async function autoCancelPassedRescheduled() {
+    try {
+        const now = new Date();
+        
+        // Get all 'accepted' reservations with reserved_datetime in the past
+        const { data: passedReservations, error } = await supabase
+            .from('tbl_reservations')
+            .select('id, reserved_datetime, service_recipient')
+            .eq('status', 'accepted')
+            .lt('reserved_datetime', now.toISOString());
 
-window.changePage = function(direction) {
-    switch(direction) {
-        case 'first':
-            currentPage = 1;
-            break;
-        case 'prev':
-            if (currentPage > 1) currentPage--;
-            break;
-        case 'next':
-            if (currentPage < totalPages) currentPage++;
-            break;
-        case 'last':
-            currentPage = totalPages;
-            break;
+        if (error) throw error;
+
+        if (!passedReservations || passedReservations.length === 0) {
+            console.log('No passed rescheduled reservations to cancel');
+            return;
+        }
+
+        console.log(`Found ${passedReservations.length} passed reservations to cancel`);
+
+        // Cancel each passed reservation
+        for (const reservation of passedReservations) {
+            await supabase
+                .from('tbl_reservations')
+                .update({
+                    status: 'cancelled',
+                    cancellation_reason: 'Time passed (system)',
+                    cancelled_by: 'system',
+                    cancelled_at: new Date().toISOString()
+                })
+                .eq('id', reservation.id);
+
+            // Log the auto-cancellation
+            await supabase.from('tbl_admin_logs').insert({
+                admin_id: null, // System action
+                action: 'reservation_cancelled',
+                target_table: 'tbl_reservations',
+                target_id: reservation.id,
+                details: {
+                    service_recipient: reservation.service_recipient,
+                    reason: 'Time passed (system)',
+                    cancelled_by: 'system',
+                    auto_cancelled: true
+                }
+            });
+
+            console.log(`Auto-cancelled reservation ${reservation.id}`);
+        }
+
+        // Reload the reservations table after auto-cancellation
+        await loadReservations();
+
+    } catch (error) {
+        console.error('Error auto-cancelling passed reservations:', error);
     }
+}
+
+function setupFilters() {
+    const reservedByFilter = document.getElementById('filterReservedBy');
+    const cancelledWhenFilter = document.getElementById('filterCancelledWhen');
+    const resetBtn = document.getElementById('resetFilters');
+
+    // Auto-filter on input change
+    if (reservedByFilter) {
+        reservedByFilter.addEventListener('input', applyFilters);
+    }
+
+    if (cancelledWhenFilter) {
+        cancelledWhenFilter.addEventListener('change', applyFilters);
+    }
+
+    if (resetBtn) {
+        resetBtn.addEventListener('click', resetFilters);
+    }
+}
+
+function applyFilters() {
+    const reservedByValue = document.getElementById('filterReservedBy')?.value.toLowerCase().trim() || '';
+    const cancelledWhenValue = document.getElementById('filterCancelledWhen')?.value || '';
+
+    filteredReservations = allReservations.filter(res => {
+        // Filter by Reserved By (client name)
+        const clientName = res.tbl_users 
+            ? `${res.tbl_users.first_name} ${res.tbl_users.last_name}`.toLowerCase()
+            : '';
+        const reservedByMatch = !reservedByValue || clientName.includes(reservedByValue);
+
+        // Filter by Cancelled When (date)
+        let cancelledWhenMatch = true;
+        if (cancelledWhenValue && res.cancelled_at) {
+            const cancelledDate = new Date(res.cancelled_at).toISOString().split('T')[0];
+            cancelledWhenMatch = cancelledDate === cancelledWhenValue;
+        } else if (cancelledWhenValue && !res.cancelled_at) {
+            cancelledWhenMatch = false;
+        }
+
+        return reservedByMatch && cancelledWhenMatch;
+    });
+
+    currentPage = 1;
     displayCurrentPage();
-    updatePagination();
-};
+}
+
+function resetFilters() {
+    document.getElementById('filterReservedBy').value = '';
+    document.getElementById('filterCancelledWhen').value = '';
+    
+    filteredReservations = [...allReservations];
+    currentPage = 1;
+    displayCurrentPage();
+}
 
 function displayCurrentPage() {
-    const start = (currentPage - 1) * itemsPerPage;
-    const end = start + itemsPerPage;
-    const pageData = allCancelled.slice(start, end);
-    
     const tbody = document.querySelector('#cancelledTable tbody');
     
-    if (pageData.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 40px; color: #999;">No cancelled reservations</td></tr>';
+    if (filteredReservations.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 40px; color: #999;">No cancelled reservations found</td></tr>';
+        updatePagination();
         return;
     }
+
+    // Calculate pagination
+    const totalPages = Math.ceil(filteredReservations.length / itemsPerPage);
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = Math.min(startIndex + itemsPerPage, filteredReservations.length);
+    const pageData = filteredReservations.slice(startIndex, endIndex);
 
     tbody.innerHTML = pageData.map(res => {
         const baseService = res.tbl_reservation_services?.find(s => s.is_base_service);
@@ -137,14 +236,27 @@ function displayCurrentPage() {
             day: 'numeric',
             year: 'numeric'
         });
+        
         const timeStr = dateTime.toLocaleTimeString('en-US', {
             hour: 'numeric',
             minute: '2-digit',
             hour12: true
         });
 
-        // Determine who cancelled - check if cancelled_by matches user_id
-        const cancelledBy = res.cancelled_by === res.user_id ? 'Client' : 'Admin';
+        // FIXED: Cancelled By (who cancelled - client or admin or system)
+        let cancelledBy = 'N/A';
+        if (res.cancelled_by) {
+            if (res.cancelled_by === 'system') {
+                cancelledBy = 'System';
+            } else if (res.cancelled_by === res.user_id) {
+                cancelledBy = 'Client';
+            } else {
+                cancelledBy = 'Admin';
+            }
+        }
+
+        // FIXED: Cancellation Reason (the actual reason)
+        const cancellationReason = res.cancellation_reason || 'No reason provided';
 
         return `
             <tr>
@@ -153,35 +265,73 @@ function displayCurrentPage() {
                 <td>${barberName}</td>
                 <td>${serviceDetails}</td>
                 <td><strong>₱${res.total_price}</strong></td>
-                <td>${dateStr}<br><small style="color: #666;">${timeStr}</small></td>
-                <td style="max-width: 200px;">${res.cancellation_reason || 'No reason provided'}</td>
-                <td><strong style="color: ${cancelledBy === 'Admin' ? '#ef4444' : '#ff9800'};">${cancelledBy}</strong></td>
+                <td>
+                    ${dateStr}<br>
+                    <small style="color: #666;">${timeStr}</small>
+                </td>
+                <td>${cancellationReason}</td>
+                <td><strong>${cancelledBy}</strong></td>
             </tr>
         `;
     }).join('');
+
+    updatePagination();
 }
+
+function updatePagination() {
+    const totalPages = Math.ceil(filteredReservations.length / itemsPerPage) || 1;
+    const pageInfo = document.getElementById('pageInfo');
+    if (pageInfo) {
+        pageInfo.textContent = `Page ${currentPage} / ${totalPages}`;
+    }
+}
+
+window.changePage = function(direction) {
+    const totalPages = Math.ceil(filteredReservations.length / itemsPerPage) || 1;
+    
+    switch(direction) {
+        case 'first':
+            currentPage = 1;
+            break;
+        case 'prev':
+            if (currentPage > 1) currentPage--;
+            break;
+        case 'next':
+            if (currentPage < totalPages) currentPage++;
+            break;
+        case 'last':
+            currentPage = totalPages;
+            break;
+    }
+    displayCurrentPage();
+};
 
 function setupDropdown() {
     const userIcon = document.getElementById('userIcon');
     const dropdown = document.getElementById('userDropdown');
 
-    userIcon.addEventListener('click', (e) => {
-        e.stopPropagation();
-        dropdown.classList.toggle('show');
-    });
+    if (userIcon && dropdown) {
+        userIcon.addEventListener('click', (e) => {
+            e.stopPropagation();
+            dropdown.classList.toggle('show');
+        });
 
-    document.addEventListener('click', (e) => {
-        if (!e.target.closest('.user-profile')) {
-            dropdown.classList.remove('show');
-        }
-    });
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.user-profile')) {
+                dropdown.classList.remove('show');
+            }
+        });
+    }
 }
 
 function setupSignOut() {
-    document.getElementById('signOutLink').addEventListener('click', async (e) => {
-        e.preventDefault();
-        await supabase.auth.signOut();
-        localStorage.removeItem('currentUser');
-        window.location.href = 'login.html';
-    });
+    const signOutLink = document.getElementById('signOutLink');
+    if (signOutLink) {
+        signOutLink.addEventListener('click', async (e) => {
+            e.preventDefault();
+            await supabase.auth.signOut();
+            localStorage.removeItem('currentUser');
+            window.location.href = 'login.html';
+        });
+    }
 }

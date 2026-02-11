@@ -15,7 +15,7 @@
 }
 
 body {
-    background: linear-gradient(135deg, var(--bg-cream) 0%, #e8dcc8 100%);
+    background: linear-gradient(135deg, var(--bg-cream) 0%, #ffffff 100%);
     min-height: 100vh;
     display: flex;
     align-items: center;
@@ -176,7 +176,6 @@ body {
     display: flex;
     gap: 15px;
     text-align: left;
-    border: 2px dashed var(--brown-light);
 }
 
 .info-box i {

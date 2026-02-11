@@ -6,7 +6,7 @@
     <title>Cancelled Reservations - Boss Lupit Gupit</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="admin-manage-reservations.css">
+    <link rel="stylesheet" href="admin-cancelled-reservations.css">
     <link rel="icon" type="image/png" href="blgcircle.png">
 </head>
 <body>
@@ -42,7 +42,32 @@
             </button>
             <h1>Cancelled Reservations</h1>
         </div>
+        
+            <div class="filters-section">
+                <div class="filter-group">
+                    <label><i class="fa-solid fa-user"></i> Reserved By</label>
+                    <input 
+                        type="text" 
+                        id="filterReservedBy" 
+                        placeholder="Search by client name..."
+                        class="filter-input">
+                </div>
 
+                <div class="filter-group">
+                    <label><i class="fa-solid fa-calendar-xmark"></i> Cancelled When</label>
+                    <input 
+                        type="date" 
+                        id="filterCancelledWhen" 
+                        class="filter-input">
+                </div>
+
+    <div class="filter-actions">
+        <button id="resetFilters" class="reset-btn">
+            <i class="fa-solid fa-rotate-right"></i>
+            Reset
+        </button>
+    </div>
+</div>
         <div class="table-wrapper">
             <table id="cancelledTable">
                 <thead>

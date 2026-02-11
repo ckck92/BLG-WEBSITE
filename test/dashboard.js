@@ -60,8 +60,8 @@ function renderForRole() {
     nav.innerHTML = `
         <ul>
             <li><a href="dashboard.html" class="active">Home</a></li>
-            <li><a href="reservations-list.html">Reservations</a></li>
-            <li><a href="seats.html">Live Seats</a></li>
+            <li><a href="reservations-list.html">Reservations List</a></li>
+            <li><a href="seats.html">View Live Seats</a></li>
             <li><a href="history.html">Service History</a></li>
         </ul>
     `;
@@ -147,7 +147,6 @@ async function loadClientReservations() {
                 </div>
                 <div class="description-text">
                     <span class="text" style="color: #8b5a2b;">
-                        <a href="reservations.html" style="color: #4a2c0a; font-weight: 600;">Make a reservation now!</a>
                     </span>
                 </div>
             `;
